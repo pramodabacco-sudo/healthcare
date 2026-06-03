@@ -32,14 +32,14 @@ export default function OPDDashboard() {
   const pendingReminders = patients.filter(p => p.reminderEnabled && p.reminderStatus === "Pending" && p.followUpDate >= todayStr);
 
   return (
-    <div>
+    <div className="p-3 sm:p-6 max-w-7xl mx-auto w-full overflow-hidden">
       <PageHeader
         title="OPD Dashboard"
         subtitle="Outpatient Department Overview"
         action={
           <button
             onClick={() => navigate("/opd/register")}
-            className="flex items-center gap-2 bg-gradient-to-r from-teal-500 to-cyan-400 text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-teal-500/20"
+            className="flex items-center justify-center gap-2 w-full sm:w-auto bg-gradient-to-r from-teal-500 to-cyan-400 text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-teal-500/20"
           >
             <UserPlus className="w-4 h-4" />
             <span>Register Patient</span>
@@ -47,18 +47,18 @@ export default function OPDDashboard() {
         }
       />
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-        <StatCard label="Patients Today"          value={today.length}                               icon={Users}       color="blue"   sub="Jan 15, 2025" />
+      {/* Stats - FIX: Changed grid-cols-2 to grid-cols-1 below sm breakpoint */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+        <StatCard label="Patients Today"           value={today.length}                               icon={Users}       color="blue"   sub="Jan 15, 2025" />
         <StatCard label="Consultation Collection" value={`₹${totalFee.toLocaleString()}`}            icon={Stethoscope} color="green"  sub="Today's fees" />
         <StatCard label="Cash Collection"         value={`₹${totalCash.toLocaleString()}`}           icon={Banknote}    color="yellow" sub="Cash payments" />
         <StatCard label="UPI Collection"          value={`₹${totalUPI.toLocaleString()}`}            icon={Smartphone}  color="purple" sub="UPI payments" />
       </div>
 
-      {/* New: Today's Follow-Ups, Incoming, Reminders row */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      {/* Today's Follow-Ups, Incoming, Reminders row - FIX: Added md:grid-cols-3 */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {/* Today's Follow-Ups */}
-        <div className="bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 rounded-2xl p-5">
+        <div className="bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 rounded-2xl p-4 sm:p-5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-amber-800 dark:text-amber-400 font-semibold text-sm flex items-center gap-2">
               <CalendarClock className="w-4 h-4" /> Today's Follow-Ups
@@ -87,7 +87,7 @@ export default function OPDDashboard() {
         </div>
 
         {/* Incoming Patients */}
-        <div className="bg-blue-50 dark:bg-blue-500/5 border border-blue-200 dark:border-blue-500/20 rounded-2xl p-5">
+        <div className="bg-blue-50 dark:bg-blue-500/5 border border-blue-200 dark:border-blue-500/20 rounded-2xl p-4 sm:p-5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-blue-800 dark:text-blue-400 font-semibold text-sm flex items-center gap-2">
               <Users className="w-4 h-4" /> Incoming (7 days)
@@ -116,7 +116,7 @@ export default function OPDDashboard() {
         </div>
 
         {/* Pending Reminders */}
-        <div className="bg-violet-50 dark:bg-violet-500/5 border border-violet-200 dark:border-violet-500/20 rounded-2xl p-5">
+        <div className="bg-violet-50 dark:bg-violet-500/5 border border-violet-200 dark:border-violet-500/20 rounded-2xl p-4 sm:p-5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-violet-800 dark:text-violet-400 font-semibold text-sm flex items-center gap-2">
               <Bell className="w-4 h-4" /> Pending Reminders
@@ -146,7 +146,7 @@ export default function OPDDashboard() {
       </div>
 
       {/* Charts row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         {/* Payment split */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm dark:shadow-none transition-colors duration-300">
           <h3 className="text-slate-800 dark:text-white font-semibold text-sm mb-4 flex items-center gap-2">
@@ -182,7 +182,7 @@ export default function OPDDashboard() {
           </h3>
           <div className="space-y-2">
             {[
-              { label: "Total Patients", val: patients.length,                                                          color: "text-blue-600 dark:text-blue-400" },
+              { label: "Total Patients", val: patients.length,                                                                                        color: "text-blue-600 dark:text-blue-400" },
               { label: "Total Revenue",  val: `₹${patients.reduce((s, p) => s + p.total, 0).toLocaleString()}`,         color: "text-emerald-600 dark:text-emerald-400" },
               { label: "Total Cash",     val: `₹${patients.reduce((s, p) => s + p.cash, 0).toLocaleString()}`,          color: "text-amber-600 dark:text-amber-400" },
               { label: "Total UPI",      val: `₹${patients.reduce((s, p) => s + p.upi, 0).toLocaleString()}`,           color: "text-violet-600 dark:text-violet-400" },
@@ -196,7 +196,7 @@ export default function OPDDashboard() {
         </div>
 
         {/* Upcoming Follow-Ups */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm dark:shadow-none transition-colors duration-300 sm:col-span-2 lg:col-span-1">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm dark:shadow-none transition-colors duration-300 md:col-span-2 lg:col-span-1">
           <h3 className="text-slate-800 dark:text-white font-semibold text-sm mb-4 flex items-center gap-2">
             <CalendarClock className="w-4 h-4 text-slate-400 dark:text-slate-500" />
             Upcoming Follow-Ups
@@ -261,8 +261,8 @@ export default function OPDDashboard() {
                   <td className="px-5 py-3.5 text-emerald-600 dark:text-emerald-400 font-medium">₹{p.fee}</td>
                   <td className="px-5 py-3.5">
                     <div className="flex gap-1 flex-wrap">
-                      {p.cash > 0 && <span className="text-xs px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-transparent">Cash</span>}
-                      {p.upi  > 0 && <span className="text-xs px-2 py-0.5 rounded-full bg-violet-50 dark:bg-violet-500/15 text-violet-700 dark:text-violet-400 border border-violet-200 dark:border-transparent">UPI</span>}
+                      {p.cash > 0 && <span className="text-xs px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-200 dark:transparent">Cash</span>}
+                      {p.upi  > 0 && <span className="text-xs px-2 py-0.5 rounded-full bg-violet-50 dark:bg-violet-500/15 text-violet-700 dark:text-violet-400 border border-violet-200 dark:transparent">UPI</span>}
                     </div>
                   </td>
                   <td className="px-5 py-3.5 text-slate-500 dark:text-slate-400">{p.visitDate}</td>

@@ -7,7 +7,7 @@ import {
 } from "../../components/UI";
 import IPDPatientForm from "./IPDPatientForm";
 import IPDPatientDetails from "./IPDPatientDetails";
-import { UserPlus, Search } from "lucide-react";
+import { UserPlus, Search, Calendar, Clock, CreditCard } from "lucide-react";
 
 const PER_PAGE = 7;
 
@@ -48,7 +48,7 @@ export default function IPDPatientList({ patients, setPatients, readOnly = false
   if (viewing) return <IPDPatientDetails patient={viewing} setPatients={setPatients} onBack={() => setViewing(null)} readOnly={readOnly} />;
 
   return (
-    <div>
+    <div className="w-full px-2 sm:px-4 max-w-7xl mx-auto">
       <PageHeader
         title="IPD Patients"
         subtitle={`${filtered.length} records`}
@@ -66,14 +66,17 @@ export default function IPDPatientList({ patients, setPatients, readOnly = false
         }
       />
 
-      <div className="flex flex-col sm:flex-row gap-3 mb-4">
-        <SearchBar value={search} onChange={s => { setSearch(s); setPage(1); }} placeholder="Search by name or IPD no..." />
-        <div className="flex gap-2 flex-wrap">
+      {/* Responsive Filters Layout */}
+      <div className="flex flex-col gap-3 mb-4 md:flex-row md:items-center">
+        <div className="flex-1">
+          <SearchBar value={search} onChange={s => { setSearch(s); setPage(1); }} placeholder="Search by name or IPD no..." />
+        </div>
+        <div className="flex gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
           {["", "Admitted", "Discharged"].map(s => (
             <button
               key={s}
               onClick={() => { setStatusFilter(s); setPage(1); }}
-              className={`px-3 py-2 rounded-xl text-xs font-medium transition-colors border ${
+              className={`px-3 py-2 rounded-xl text-xs font-medium transition-colors border whitespace-nowrap ${
                 statusFilter === s
                   ? "bg-violet-50 dark:bg-violet-500/20 text-violet-700 dark:text-violet-400 border-violet-200 dark:border-violet-500/30"
                   : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
@@ -85,72 +88,174 @@ export default function IPDPatientList({ patients, setPatients, readOnly = false
         </div>
       </div>
 
-      <TableCard>
-        <thead>
-          <tr>
-            <Th>IPD No.</Th><Th>Patient</Th><Th>Admission</Th><Th>Time</Th>
-            <Th>Deposit</Th><Th>Cash</Th><Th>UPI</Th><Th>Card</Th><Th>Total Paid</Th>
-            <Th>Balance</Th><Th>Settlement</Th><Th>Discharge</Th>
-            {!readOnly && <Th>Actions</Th>}
-          </tr>
-        </thead>
-        <tbody>
-          {paginated.length === 0 ? (
-            <tr><td colSpan={13}><EmptyState icon={Search} message="No patients found" /></td></tr>
-          ) : paginated.map(p => (
-            <tr key={p.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-              <Td>
-                <span className="font-mono text-xs text-violet-600 dark:text-violet-400 font-bold">{p.serialNumber || "—"}</span>
-              </Td>
-              <Td>
-                <button onClick={() => setViewing(p)} className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border flex-shrink-0 ${
-                    p.status === "Admitted"
-                      ? "bg-violet-50 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 border-violet-100 dark:border-transparent"
-                      : "bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-transparent"
-                  }`}>
-                    {p.name[0]}
-                  </div>
-                  <span className="text-slate-800 dark:text-white font-medium whitespace-nowrap">{p.name}</span>
-                </button>
-              </Td>
-              <Td><span className="text-slate-500 dark:text-slate-400">{p.admissionDate}</span></Td>
-              <Td><span className="text-slate-500 dark:text-slate-400">{p.admissionTime}</span></Td>
-              <Td><span className="text-blue-600 dark:text-blue-400">₹{p.deposit?.toLocaleString()}</span></Td>
-              <Td>{p.cash > 0 ? <span className="text-amber-600 dark:text-amber-400">₹{p.cash}</span> : <span className="text-slate-300 dark:text-slate-600">—</span>}</Td>
-              <Td>{p.upi  > 0 ? <span className="text-violet-600 dark:text-violet-400">₹{p.upi}</span>  : <span className="text-slate-300 dark:text-slate-600">—</span>}</Td>
-              <Td>{(p.card || 0) > 0 ? <span className="text-blue-500 dark:text-blue-400">₹{p.card}</span> : <span className="text-slate-300 dark:text-slate-600">—</span>}</Td>
-              <Td><span className="text-emerald-600 dark:text-emerald-400 font-medium">₹{p.totalPaid?.toLocaleString()}</span></Td>
-              <Td>
-                {p.balance > 0
-                  ? <span className="text-red-500 dark:text-red-400 font-medium">₹{p.balance?.toLocaleString()}</span>
-                  : <span className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold">Cleared</span>}
-              </Td>
-              <Td>
-                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border whitespace-nowrap ${settlementColors[p.settlementStatus] || settlementColors["Pending"]}`}>
-                  {p.settlementStatus || "Pending"}
-                </span>
-              </Td>
-              <Td>
-                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border whitespace-nowrap ${dischargeStatusColors[p.dischargeStatus] || dischargeStatusColors["Admitted"]}`}>
-                  {p.dischargeStatus || "Admitted"}
-                </span>
-              </Td>
-              {!readOnly && (
-                <Td>
-                  <div className="flex gap-1">
-                    <ActionBtn type="view"   onClick={() => setViewing(p)} />
-                    <ActionBtn type="edit"   onClick={() => setEditing(p)} />
-                    <ActionBtn type="delete" onClick={() => setDeleteId(p.id)} />
-                  </div>
-                </Td>
-              )}
-            </tr>
-          ))}
-        </tbody>
-      </TableCard>
+      {/* Fallback Empty Area Rendering */}
+      {paginated.length === 0 ? (
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8">
+          <EmptyState icon={Search} message="No patients found" />
+        </div>
+      ) : (
+        <>
+          {/* 1. DESKTOP MODE: Displayed inside large width viewports */}
+          <div className="hidden xl:block">
+            <TableCard>
+              <thead>
+                <tr>
+                  <Th>IPD No.</Th><Th>Patient</Th><Th>Admission</Th><Th>Time</Th>
+                  <Th>Deposit</Th><Th>Cash</Th><Th>UPI</Th><Th>Card</Th><Th>Total Paid</Th>
+                  <Th>Balance</Th><Th>Settlement</Th><Th>Discharge</Th>
+                  {!readOnly && <Th>Actions</Th>}
+                </tr>
+              </thead>
+              <tbody>
+                {paginated.map(p => (
+                  <tr key={p.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                    <Td>
+                      <span className="font-mono text-xs text-violet-600 dark:text-violet-400 font-bold">{p.serialNumber || "—"}</span>
+                    </Td>
+                    <Td>
+                      <button onClick={() => setViewing(p)} className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border flex-shrink-0 ${
+                          p.status === "Admitted"
+                            ? "bg-violet-50 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 border-violet-100 dark:border-transparent"
+                            : "bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-transparent"
+                        }`}>
+                          {p.name[0]}
+                        </div>
+                        <span className="text-slate-800 dark:text-white font-medium whitespace-nowrap">{p.name}</span>
+                      </button>
+                    </Td>
+                    <Td><span className="text-slate-500 dark:text-slate-400">{p.admissionDate}</span></Td>
+                    <Td><span className="text-slate-500 dark:text-slate-400">{p.admissionTime}</span></Td>
+                    <Td><span className="text-blue-600 dark:text-blue-400">₹{p.deposit?.toLocaleString()}</span></Td>
+                    <Td>{p.cash > 0 ? <span className="text-amber-600 dark:text-amber-400">₹{p.cash}</span> : <span className="text-slate-300 dark:text-slate-600">—</span>}</Td>
+                    <Td>{p.upi  > 0 ? <span className="text-violet-600 dark:text-violet-400">₹{p.upi}</span>  : <span className="text-slate-300 dark:text-slate-600">—</span>}</Td>
+                    <Td>{(p.card || 0) > 0 ? <span className="text-blue-500 dark:text-blue-400">₹{p.card}</span> : <span className="text-slate-300 dark:text-slate-600">—</span>}</Td>
+                    <Td><span className="text-emerald-600 dark:text-emerald-400 font-medium">₹{p.totalPaid?.toLocaleString()}</span></Td>
+                    <Td>
+                      {p.balance > 0
+                        ? <span className="text-red-500 dark:text-red-400 font-medium">₹{p.balance?.toLocaleString()}</span>
+                        : <span className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold">Cleared</span>}
+                    </Td>
+                    <Td>
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border whitespace-nowrap ${settlementColors[p.settlementStatus] || settlementColors["Pending"]}`}>
+                        {p.settlementStatus || "Pending"}
+                      </span>
+                    </Td>
+                    <Td>
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border whitespace-nowrap ${dischargeStatusColors[p.dischargeStatus] || dischargeStatusColors["Admitted"]}`}>
+                        {p.dischargeStatus || "Admitted"}
+                      </span>
+                    </Td>
+                    {!readOnly && (
+                      <Td>
+                        <div className="flex gap-1">
+                          <ActionBtn type="view"   onClick={() => setViewing(p)} />
+                          <ActionBtn type="edit"   onClick={() => setEditing(p)} />
+                          <ActionBtn type="delete" onClick={() => setDeleteId(p.id)} />
+                        </div>
+                      </Td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </TableCard>
+          </div>
 
-      <Pagination current={page} total={totalPages} onPageChange={setPage} />
+          {/* 2. MOBILE CARD GRID MODE: Rendered on anything less than xl desktops */}
+          <div className="block xl:hidden space-y-3.5">
+            {paginated.map(p => (
+              <div key={p.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
+                
+                {/* Row 1: Profile Identifiers */}
+                <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-3 mb-3">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <button onClick={() => setViewing(p)} className="flex-shrink-0">
+                      <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm border ${
+                        p.status === "Admitted"
+                          ? "bg-violet-50 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 border-violet-100 dark:border-transparent"
+                          : "bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-transparent"
+                      }`}>
+                        {p.name[0]}
+                      </div>
+                    </button>
+                    <div className="min-w-0">
+                      <h4 className="text-slate-800 dark:text-white font-semibold text-sm truncate">{p.name}</h4>
+                      <p className="text-xs text-violet-600 dark:text-violet-400 font-mono font-bold mt-0.5">
+                        IPD No: {p.serialNumber || "—"}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1 items-end flex-shrink-0 pl-1">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border whitespace-nowrap ${dischargeStatusColors[p.dischargeStatus] || dischargeStatusColors["Admitted"]}`}>
+                      {p.dischargeStatus || "Admitted"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Row 2: Intake Scheduling */}
+                <div className="grid grid-cols-2 gap-2 text-xs text-slate-500 dark:text-slate-400 mb-3 bg-slate-50/50 dark:bg-slate-800/20 p-2 rounded-xl border border-slate-100 dark:border-slate-800/50">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <Calendar className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+                    <span className="truncate">Adm: {p.admissionDate}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <Clock className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+                    <span className="truncate">Time: {p.admissionTime}</span>
+                  </div>
+                </div>
+
+                {/* Row 3: Financial Breakdowns */}
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs border-b border-slate-100 dark:border-slate-800 pb-3 mb-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-400">Initial Deposit:</span>
+                    <span className="font-medium text-blue-600 dark:text-blue-400">₹{p.deposit || 0}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-400">Total Paid:</span>
+                    <span className="font-medium text-emerald-600 dark:text-emerald-400">₹{p.totalPaid || 0}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-400">Settlement:</span>
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${settlementColors[p.settlementStatus] || settlementColors["Pending"]}`}>
+                      {p.settlementStatus || "Pending"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-400 font-semibold">Net Balance:</span>
+                    {p.balance > 0 ? (
+                      <span className="font-bold text-red-500">₹{p.balance?.toLocaleString()}</span>
+                    ) : (
+                      <span className="text-emerald-600 dark:text-emerald-400 font-bold text-xs">Cleared</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Row 4: Transaction Mediums & Row Actions */}
+                <div className="flex justify-between items-center">
+                  <div className="flex gap-1 items-center max-w-[60%] flex-wrap">
+                    {p.cash > 0 && <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-transparent">Cash</span>}
+                    {p.upi > 0 && <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400 border border-purple-100 dark:border-transparent">UPI</span>}
+                    {p.card > 0 && <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-transparent">Card</span>}
+                  </div>
+                  
+                  {!readOnly && (
+                    <div className="flex gap-1 flex-shrink-0">
+                      <ActionBtn type="view"   onClick={() => setViewing(p)} />
+                      <ActionBtn type="edit"   onClick={() => setEditing(p)} />
+                      <ActionBtn type="delete" onClick={() => setDeleteId(p.id)} />
+                    </div>
+                  )}
+                </div>
+
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      <div className="mt-4">
+        <Pagination current={page} total={totalPages} onPageChange={setPage} />
+      </div>
 
       {deleteId && (
         <DeleteModal

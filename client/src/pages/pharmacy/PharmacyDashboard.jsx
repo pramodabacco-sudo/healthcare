@@ -22,7 +22,6 @@ export default function PharmacyDashboard({ medicines }) {
   const navigate = useNavigate();
 
   const stats = useMemo(() => {
-    const today = new Date();
     let lowStock = 0, expiringSoon = 0, outOfStock = 0, expired = 0;
     let totalValue = 0;
     medicines.forEach(m => {
@@ -59,14 +58,14 @@ export default function PharmacyDashboard({ medicines }) {
   const recentMeds = [...medicines].reverse().slice(0, 5);
 
   return (
-    <div>
+    <div className="p-3 sm:p-6 max-w-7xl mx-auto w-full overflow-hidden">
       <PageHeader
         title="Pharmacy Dashboard"
         subtitle="Inventory & Medicine Overview"
         action={
           <button
             onClick={() => navigate("/pharmacy/add")}
-            className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-400 text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-emerald-500/20"
+            className="flex items-center justify-center gap-2 w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-400 text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-emerald-500/20"
           >
             <Plus className="w-4 h-4" />
             <span>Add Medicine</span>
@@ -74,19 +73,19 @@ export default function PharmacyDashboard({ medicines }) {
         }
       />
 
-      {/* Stat Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-6 sm:mb-8">
-        <StatCard label="Total Medicines"   value={medicines.length}                           icon={Pill}       color="teal"   />
+      {/* Stat Cards - FIX: Switched baseline to grid-cols-1 below sm screen break */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-6 sm:mb-8">
+        <StatCard label="Total Medicines"   value={medicines.length}                           icon={Pill}          color="teal"   />
         <StatCard label="Low Stock"         value={stats.lowStock}                             icon={AlertTriangle} color="yellow" sub="Need reorder" />
-        <StatCard label="Expiring Soon"     value={stats.expiringSoon}                         icon={Clock}      color="purple" sub="Within 30 days" />
-        <StatCard label="Out of Stock"      value={stats.outOfStock}                           icon={PackageX}   color="red"    sub="Needs restock" />
-        <StatCard label="Inventory Value"   value={`₹${stats.totalValue.toLocaleString()}`}    icon={TrendingUp} color="green"  sub="Purchase cost" />
+        <StatCard label="Expiring Soon"     value={stats.expiringSoon}                         icon={Clock}         color="purple" sub="Within 30 days" />
+        <StatCard label="Out of Stock"      value={stats.outOfStock}                           icon={PackageX}      color="red"    sub="Needs restock" />
+        <StatCard label="Inventory Value"   value={`₹${stats.totalValue.toLocaleString()}`}    icon={TrendingUp}    color="green"  sub="Purchase cost" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
         {/* Expiry Alerts */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm dark:shadow-none transition-colors duration-300">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-slate-800">
+          <div className="flex items-center justify-between px-4 sm:px-5 py-4 border-b border-slate-200 dark:border-slate-800">
             <h3 className="text-slate-800 dark:text-white font-semibold text-sm flex items-center gap-2">
               <Clock className="w-4 h-4 text-slate-400 dark:text-slate-500" /> Expiry Alerts
             </h3>
@@ -102,46 +101,49 @@ export default function PharmacyDashboard({ medicines }) {
               <div className="flex items-center justify-center py-10 text-slate-400 dark:text-slate-500 text-sm">
                 <CheckCircle2 className="w-4 h-4 mr-2 text-emerald-400" /> All medicines are within safe expiry
               </div>
-            ) : expiryAlerts.map(m => {
-              const isExpired = m.diffDays <= 0;
-              const isUrgent = m.diffDays <= 30;
-              return (
-                <div key={m.id} className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                  <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm border flex-shrink-0 ${
-                    isExpired
-                      ? "bg-red-50 dark:bg-red-500/20 text-red-600 dark:text-red-400 border-red-100 dark:border-transparent"
-                      : isUrgent
-                      ? "bg-amber-50 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-100 dark:border-transparent"
-                      : "bg-violet-50 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 border-violet-100 dark:border-transparent"
-                  }`}>
-                    {m.drugName[0]}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-slate-800 dark:text-white text-sm font-medium truncate">{m.drugName}</div>
-                    <div className="text-slate-400 dark:text-slate-500 text-xs">{m.batchNumber}</div>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <div className={`text-xs font-semibold px-2 py-1 rounded-full border ${
+            ) : (
+              expiryAlerts.map(m => {
+                const isExpired = m.diffDays <= 0;
+                const isUrgent = m.diffDays <= 30;
+                return (
+                  <div key={m.id} className="flex items-center gap-3 px-4 sm:px-5 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                    <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm border flex-shrink-0 ${
                       isExpired
-                        ? "bg-red-50 dark:bg-red-500/15 text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/20"
+                        ? "bg-red-50 dark:bg-red-500/20 text-red-600 dark:text-red-400 border-red-100 dark:border-transparent"
                         : isUrgent
-                        ? "bg-amber-50 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-500/20"
-                        : "bg-violet-50 dark:bg-violet-500/15 text-violet-600 dark:text-violet-400 border-violet-200 dark:border-violet-500/20"
+                        ? "bg-amber-50 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-100 dark:border-transparent"
+                        : "bg-violet-50 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 border-violet-100 dark:border-transparent"
                     }`}>
-                      {isExpired ? "Expired" : `${m.diffDays}d left`}
+                      {m.drugName[0]}
                     </div>
-                    <div className="text-slate-400 dark:text-slate-600 text-xs mt-0.5">{m.expiryDate}</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-slate-800 dark:text-white text-sm font-medium truncate">{m.drugName}</div>
+                      <div className="text-slate-400 dark:text-slate-500 text-xs truncate">{m.batchNumber}</div>
+                    </div>
+                    <div className="text-right flex-shrink-0 pl-2">
+                      <div className={`text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-full border ${
+                        isExpired
+                          ? "bg-red-50 dark:bg-red-500/15 text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/20"
+                          : isUrgent
+                          ? "bg-amber-50 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-500/20"
+                          : "bg-violet-50 dark:bg-violet-500/15 text-violet-600 dark:text-violet-400 border-violet-200 dark:border-violet-500/20"
+                      }`}>
+                        {isExpired ? "Expired" : `${m.diffDays}d left`}
+                      </div>
+                      <div className="text-slate-400 dark:text-slate-600 text-[10px] sm:text-xs mt-0.5">{m.expiryDate}</div>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </div>
 
-        {/* Low Stock */}
+        {/* Low Stock & Inventory Summary column */}
         <div className="space-y-4">
+          {/* Low Stock Card */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm dark:shadow-none transition-colors duration-300">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-slate-800">
+            <div className="flex items-center justify-between px-4 sm:px-5 py-4 border-b border-slate-200 dark:border-slate-800">
               <h3 className="text-slate-800 dark:text-white font-semibold text-sm flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-slate-400 dark:text-slate-500" /> Low Stock Medicines
               </h3>
@@ -157,38 +159,40 @@ export default function PharmacyDashboard({ medicines }) {
                 <div className="flex items-center justify-center py-8 text-slate-400 dark:text-slate-500 text-sm">
                   <CheckCircle2 className="w-4 h-4 mr-2 text-emerald-400" /> All stock levels are healthy
                 </div>
-              ) : lowStockMeds.map(m => (
-                <div key={m.id} className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                  <div className="w-8 h-8 rounded-full bg-amber-50 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-xs border border-amber-100 dark:border-transparent flex-shrink-0">
-                    {m.drugName[0]}
+              ) : (
+                lowStockMeds.map(m => (
+                  <div key={m.id} className="flex items-center gap-3 px-4 sm:px-5 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                    <div className="w-8 h-8 rounded-full bg-amber-50 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-xs border border-amber-100 dark:border-transparent flex-shrink-0">
+                      {m.drugName[0]}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-slate-800 dark:text-white text-xs font-medium truncate">{m.drugName}</div>
+                      <div className="text-slate-400 dark:text-slate-500 text-xs truncate">Reorder at: {m.reorderLevel}</div>
+                    </div>
+                    <div className="text-right flex-shrink-0 pl-2">
+                      <div className="text-amber-500 dark:text-amber-400 font-bold text-sm">{m.quantity}</div>
+                      <div className="text-slate-400 dark:text-slate-600 text-[10px]">units</div>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-slate-800 dark:text-white text-xs font-medium truncate">{m.drugName}</div>
-                    <div className="text-slate-400 dark:text-slate-500 text-xs">Reorder at: {m.reorderLevel}</div>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <div className="text-amber-500 dark:text-amber-400 font-bold text-sm">{m.quantity}</div>
-                    <div className="text-slate-400 dark:text-slate-600 text-xs">units</div>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
-          {/* Inventory Summary */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm dark:shadow-none transition-colors duration-300">
+          {/* Inventory Summary Card */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm dark:shadow-none transition-colors duration-300">
             <h3 className="text-slate-800 dark:text-white font-semibold text-sm mb-4 flex items-center gap-2">
               <Package className="w-4 h-4 text-slate-400 dark:text-slate-500" /> Inventory Summary
             </h3>
-            <div className="space-y-2">
+            <div className="space-y-1">
               {[
-                { label: "Total Medicines",  val: medicines.length,                                            color: "text-teal-600 dark:text-teal-400" },
+                { label: "Total Medicines",  val: medicines.length,                                             color: "text-teal-600 dark:text-teal-400" },
                 { label: "In Stock",         val: medicines.filter(m => getMedicineStatus(m) === "In Stock").length, color: "text-emerald-600 dark:text-emerald-400" },
                 { label: "Low Stock",        val: stats.lowStock,                                              color: "text-amber-600 dark:text-amber-400" },
                 { label: "Out of Stock",     val: stats.outOfStock,                                            color: "text-red-500 dark:text-red-400" },
                 { label: "Inventory Value",  val: `₹${stats.totalValue.toLocaleString()}`,                    color: "text-violet-600 dark:text-violet-400" },
               ].map(item => (
-                <div key={item.label} className="flex justify-between items-center py-1.5 border-b border-slate-100 dark:border-slate-800">
+                <div key={item.label} className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-800 last:border-b-0">
                   <span className="text-slate-500 dark:text-slate-400 text-sm">{item.label}</span>
                   <span className={`font-bold text-sm ${item.color}`}>{item.val}</span>
                 </div>
@@ -198,9 +202,9 @@ export default function PharmacyDashboard({ medicines }) {
         </div>
       </div>
 
-      {/* Recent Medicines */}
+      {/* Recent Medicines Table - Wrapper added for handling small device horizontal overflow */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm dark:shadow-none transition-colors duration-300">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-slate-800">
+        <div className="flex items-center justify-between px-4 sm:px-5 py-4 border-b border-slate-200 dark:border-slate-800">
           <h3 className="text-slate-800 dark:text-white font-semibold text-sm flex items-center gap-2">
             <FlaskConical className="w-4 h-4 text-slate-400 dark:text-slate-500" /> Recent Medicines
           </h3>
@@ -211,8 +215,10 @@ export default function PharmacyDashboard({ medicines }) {
             View All →
           </button>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm min-w-[540px]">
+        
+        {/* Table Container Wrapper */}
+        <div className="w-full overflow-x-auto scrollbar-thin">
+          <table className="w-full text-sm min-w-[700px]">
             <thead>
               <tr className="bg-slate-50 dark:bg-slate-900/50">
                 {["Medicine", "Category", "Batch", "Stock", "Selling Price", "Expiry", "Status"].map(h => (
@@ -226,25 +232,25 @@ export default function PharmacyDashboard({ medicines }) {
                 return (
                   <tr key={m.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors border-t border-slate-100 dark:border-slate-800/50">
                     <td className="px-5 py-3.5">
-                      <div className="flex items-center gap-2.5">
+                      <div className="flex items-center gap-2.5 max-w-[200px]">
                         <div className="w-8 h-8 rounded-full bg-emerald-50 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 text-xs font-bold border border-emerald-100 dark:border-transparent flex-shrink-0">
                           {m.drugName[0]}
                         </div>
-                        <div>
+                        <div className="truncate">
                           <span className="text-slate-800 dark:text-white font-medium truncate block">{m.drugName}</span>
-                          <span className="text-slate-400 dark:text-slate-500 text-xs">{m.genericName}</span>
+                          <span className="text-slate-400 dark:text-slate-500 text-xs truncate block">{m.genericName}</span>
                         </div>
                       </div>
                     </td>
-                    <td className="px-5 py-3.5 text-slate-500 dark:text-slate-400">{m.category}</td>
-                    <td className="px-5 py-3.5 text-slate-500 dark:text-slate-400 font-mono text-xs">{m.batchNumber}</td>
-                    <td className="px-5 py-3.5">
+                    <td className="px-5 py-3.5 text-slate-500 dark:text-slate-400 whitespace-nowrap">{m.category}</td>
+                    <td className="px-5 py-3.5 text-slate-500 dark:text-slate-400 font-mono text-xs whitespace-nowrap">{m.batchNumber}</td>
+                    <td className="px-5 py-3.5 whitespace-nowrap">
                       <span className={`font-bold ${m.quantity === 0 ? 'text-red-500 dark:text-red-400' : m.quantity <= m.reorderLevel ? 'text-amber-500 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                         {m.quantity}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5 text-emerald-600 dark:text-emerald-400 font-medium">₹{m.sellingPrice}</td>
-                    <td className="px-5 py-3.5 text-slate-500 dark:text-slate-400">{m.expiryDate}</td>
+                    <td className="px-5 py-3.5 text-emerald-600 dark:text-emerald-400 font-medium whitespace-nowrap">₹{m.sellingPrice}</td>
+                    <td className="px-5 py-3.5 text-slate-500 dark:text-slate-400 whitespace-nowrap">{m.expiryDate}</td>
                     <td className="px-5 py-3.5"><PharmacyStatusBadge status={status} /></td>
                   </tr>
                 );
