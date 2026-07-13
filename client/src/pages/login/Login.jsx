@@ -24,30 +24,35 @@ const MODULES = [
 
 export default function Login() {
   const [module, setModule] = useState("");
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     if (!module) { setError("Please select an administration module first."); return; }
     setLoading(true);
-    setTimeout(() => {
-      const result = login(username, password, module);
-      if (result.success) {
-        if (result.role === "receptionist" && result.module === "OPD") navigate("/opd-dashboard");
-        else if (result.role === "receptionist" && result.module === "IPD") navigate("/ipd-dashboard");
-        else if (result.role === "doctor" && result.module === "OPD") navigate("/doctor/opd");
-        else if (result.role === "doctor" && result.module === "IPD") navigate("/doctor/ipd");
-        else if (result.role === "pharmacy") navigate("/pharmacy-dashboard");
-      } else {
-        setError("Invalid credentials. Please verify your identity and try again.");
-        setLoading(false);
-      }
-    }, 600);
+    setError("");
+
+    // module id in MODULES is "Pharmacy" for display, but the DB/enum uses "PHARMACY"
+    const moduleForApi = module.toUpperCase();
+
+    const result = await login(email, password, moduleForApi);
+
+    if (result.success) {
+      if (result.role === "receptionist" && result.module === "OPD") navigate("/opd-dashboard");
+      else if (result.role === "receptionist" && result.module === "IPD") navigate("/ipd-dashboard");
+      else if (result.role === "doctor" && result.module === "OPD") navigate("/doctor/opd");
+      else if (result.role === "doctor" && result.module === "IPD") navigate("/doctor/ipd");
+      else if (result.role === "pharmacy") navigate("/pharmacy-dashboard");
+      else navigate("/login");
+    } else {
+      setError(result.error || "Invalid credentials. Please verify your identity and try again.");
+    }
+    setLoading(false);
   };
 
   return (
@@ -94,12 +99,12 @@ export default function Login() {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-1.5">Username</label>
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-1.5">Email</label>
               <input
-                type="text"
-                value={username}
-                onChange={e => { setUsername(e.target.value); setError(""); }}
-                placeholder="Enter your username"
+                type="email"
+                value={email}
+                onChange={e => { setEmail(e.target.value); setError(""); }}
+                placeholder="you@hospital.com"
                 className="w-full bg-slate-50/50 dark:bg-slate-950/30 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-slate-800 dark:text-slate-100 placeholder-slate-400/70 dark:placeholder-slate-600 focus:outline-none focus:border-teal-500 dark:focus:border-teal-500 focus:bg-white dark:focus:bg-slate-950 focus:shadow-[0_0_0_4px_rgba(20,184,166,0.1)] dark:focus:shadow-[0_0_0_4px_rgba(20,184,166,0.05)] transition-all duration-200 text-sm"
               />
             </div>
@@ -146,30 +151,6 @@ export default function Login() {
               )}
             </button>
           </form>
-
-          <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800/60">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 text-center mb-3">System Sandbox Access</p>
-            <div className="grid grid-cols-3 gap-2 text-xs">
-              <div className="bg-slate-50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800/40 rounded-xl p-2.5">
-                <div className="text-slate-700 dark:text-slate-300 font-bold mb-0.5 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Reception
-                </div>
-                <div className="text-slate-400 dark:text-slate-500 font-mono text-[10px]">receptionist / 123</div>
-              </div>
-              <div className="bg-slate-50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800/40 rounded-xl p-2.5">
-                <div className="text-slate-700 dark:text-slate-300 font-bold mb-0.5 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500"></span> Doctor
-                </div>
-                <div className="text-slate-400 dark:text-slate-500 font-mono text-[10px]">doctor / 123</div>
-              </div>
-              <div className="bg-slate-50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800/40 rounded-xl p-2.5">
-                <div className="text-slate-700 dark:text-slate-300 font-bold mb-0.5 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Pharmacy
-                </div>
-                <div className="text-slate-400 dark:text-slate-500 font-mono text-[10px]">pharmacy / 123</div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
