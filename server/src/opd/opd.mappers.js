@@ -101,6 +101,14 @@ export function fromDbPatient(p) {
     diagnosis: p.diagnosis || "",
     prescription: p.prescription || "",
     doctorNotes: p.doctorNotes || "",
+    prescribedMedicines: (p.prescribedMedicines || []).map((pm) => ({
+      id: pm.id,
+      medicineId: pm.medicineId,
+      drugName: pm.medicine?.drugName || "Unknown",
+      quantity: pm.quantity,
+      dosageInstructions: pm.dosageInstructions || "",
+      createdAt: pm.createdAt,
+    })),
     createdAt: p.createdAt,
     updatedAt: p.updatedAt,
   };

@@ -69,7 +69,10 @@ export async function listFollowUps(req, res) {
 // GET /api/opd/patients/:id
 export async function getPatient(req, res) {
   try {
-    const patient = await prisma.oPDPatient.findUnique({ where: { id: req.params.id } });
+    const patient = await prisma.oPDPatient.findUnique({
+      where: { id: req.params.id },
+      include: { prescribedMedicines: { include: { medicine: true }, orderBy: { createdAt: "asc" } } },
+    });
     if (!patient) return res.status(404).json({ message: "Patient not found." });
     return res.status(200).json({ patient: fromDbPatient(patient) });
   } catch (err) {
@@ -128,5 +131,88 @@ export async function deletePatient(req, res) {
   } catch (err) {
     console.error("Delete OPD patient error:", err);
     return res.status(500).json({ message: "Could not delete patient." });
+  }
+}
+
+// POST /api/opd/patients/:id/prescriptions
+// Body: { medicineId, quantity, dosageInstructions }
+// Adds a structured prescription line AND immediately reduces the medicine's
+// stock — blocking entirely if there isn't enough, with an exact reason so
+// staff know precisely how much to restock.
+export async function createPrescription(req, res) {
+  try {
+    const { medicineId, quantity, dosageInstructions } = req.body;
+
+    const qty = parseInt(quantity, 10);
+    if (!medicineId || !qty || qty <= 0) {
+      return res.status(400).json({ message: "medicineId and a positive quantity are required." });
+    }
+
+    const patient = await prisma.oPDPatient.findUnique({ where: { id: req.params.id } });
+    if (!patient) return res.status(404).json({ message: "Patient not found." });
+
+    const medicine = await prisma.medicine.findUnique({ where: { id: medicineId } });
+    if (!medicine) return res.status(404).json({ message: "Medicine not found." });
+
+    if (qty > medicine.quantity) {
+      return res.status(400).json({
+        message: `Only ${medicine.quantity} unit(s) of ${medicine.drugName} left, but ${qty} were requested. Please restock before prescribing.`,
+      });
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      const prescribed = await tx.prescribedMedicine.create({
+        data: {
+          opdPatientId: req.params.id,
+          medicineId,
+          quantity: qty,
+          dosageInstructions: dosageInstructions || null,
+        },
+      });
+
+      await tx.medicine.update({
+        where: { id: medicineId },
+        data: { quantity: medicine.quantity - qty },
+      });
+
+      await tx.stockHistory.create({
+        data: {
+          medicineId,
+          date: new Date(),
+          action: "REDUCE",
+          quantity: -qty,
+          reason: `Dispensed for OPD patient ${patient.name} (Token OPD-${String(patient.tokenNumber).padStart(3, "0")})`,
+        },
+      });
+
+      return tx.oPDPatient.findUnique({
+        where: { id: req.params.id },
+        include: { prescribedMedicines: { include: { medicine: true }, orderBy: { createdAt: "asc" } } },
+      });
+    });
+
+    return res.status(201).json({ patient: fromDbPatient(result) });
+  } catch (err) {
+    console.error("Create prescription error:", err);
+    return res.status(500).json({ message: "Could not add prescribed medicine." });
+  }
+}
+
+// DELETE /api/opd/patients/:id/prescriptions/:itemId
+// Deletes the record only — does NOT restore stock. If tablets weren't
+// actually dispensed, stock must be corrected manually via Pharmacy's
+// Add Stock action (kept intentionally separate to avoid silent inventory drift).
+export async function deletePrescription(req, res) {
+  try {
+    const existing = await prisma.prescribedMedicine.findUnique({ where: { id: req.params.itemId } });
+    if (!existing || existing.opdPatientId !== req.params.id) {
+      return res.status(404).json({ message: "Prescribed medicine record not found." });
+    }
+
+    await prisma.prescribedMedicine.delete({ where: { id: req.params.itemId } });
+    return res.status(200).json({ message: "Prescription record deleted. Stock was not restored." });
+  } catch (err) {
+    console.error("Delete prescription error:", err);
+    return res.status(500).json({ message: "Could not delete prescription record." });
   }
 }

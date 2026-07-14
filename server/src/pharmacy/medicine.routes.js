@@ -12,13 +12,17 @@ import {
 
 const router = Router();
 
-router.use(requireAuth, requireModule("PHARMACY"));
+router.use(requireAuth);
 
-router.get("/", listMedicines);
-router.get("/:id", getMedicine);
-router.post("/", createMedicine);
-router.put("/:id", updateMedicine);
-router.delete("/:id", deleteMedicine);
-router.post("/:id/stock", addStockEntry);
+// Read-only: OPD needs this to show medicine names/stock counts when
+// prescribing. Pharmacy obviously needs it too.
+router.get("/", requireModule("OPD", "PHARMACY"), listMedicines);
+router.get("/:id", requireModule("OPD", "PHARMACY"), getMedicine);
+
+// Mutating routes stay Pharmacy-only.
+router.post("/", requireModule("PHARMACY"), createMedicine);
+router.put("/:id", requireModule("PHARMACY"), updateMedicine);
+router.delete("/:id", requireModule("PHARMACY"), deleteMedicine);
+router.post("/:id/stock", requireModule("PHARMACY"), addStockEntry);
 
 export default router;

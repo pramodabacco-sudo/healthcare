@@ -95,6 +95,8 @@ model OPDPatient {
   prescription String? @db.Text
   doctorNotes  String? @db.Text
 
+  prescribedMedicines PrescribedMedicine[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -124,6 +126,7 @@ model Medicine {
   notes         String?  @db.Text
 
   stockHistory StockHistory[]
+  prescribedMedicines PrescribedMedicine[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -145,4 +148,15 @@ model StockHistory {
   reason     String
 
   createdAt DateTime @default(now())
+}
+
+model PrescribedMedicine {
+  id            String   @id @default(cuid())
+  opdPatientId  String
+  opdPatient    OPDPatient @relation(fields: [opdPatientId], references: [id], onDelete: Cascade)
+  medicineId    String
+  medicine      Medicine   @relation(fields: [medicineId], references: [id])
+  quantity      Int
+  dosageInstructions String? @db.Text   // e.g. "1-0-1 after food for 5 days"
+  createdAt     DateTime @default(now())
 }

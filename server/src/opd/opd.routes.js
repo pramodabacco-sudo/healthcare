@@ -8,6 +8,8 @@ import {
   createPatient,
   updatePatient,
   deletePatient,
+  createPrescription,
+  deletePrescription,
 } from "./opd.controller.js";
 
 const router = Router();
@@ -25,5 +27,9 @@ router.get("/:id", getPatient);
 router.post("/", createPatient);
 router.put("/:id", updatePatient);
 router.delete("/:id", deletePatient);
+
+// Structured prescriptions — both doctors and receptionists can add these.
+router.post("/:id/prescriptions", createPrescription);
+router.delete("/:id/prescriptions/:itemId", deletePrescription);
 
 export default router;
