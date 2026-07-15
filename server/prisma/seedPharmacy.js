@@ -4,10 +4,8 @@
 // Pharmacy dashboard/list/stock-history/expiry pages have real data to show.
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
-const prisma = new PrismaClient({ adapter });
+const prisma = new PrismaClient();
 
 const CATEGORY_NAMES = [
   "Analgesic", "Antibiotic", "Antidiabetic", "Antihypertensive",

@@ -4,10 +4,8 @@
 // follow-ups pages have real data to work with instead of an empty table.
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
-const prisma = new PrismaClient({ adapter });
+const prisma = new PrismaClient();
 
 const FIRST_NAMES_MALE = [
   "Ramesh", "Arun", "Vijay", "Suresh", "Mohan", "Karthik", "Senthil", "Gopal",
