@@ -1,5 +1,4 @@
 // client/src/App.jsx
-// Replace your existing App.jsx with this file
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useState } from "react";
 import { AuthProvider, useAuth } from "./context/AuthContext";
@@ -19,6 +18,8 @@ import IPDDashboard from "./pages/ipd/IPDDashboard";
 import IPDPatientList from "./pages/ipd/IPDPatientList";
 import IPDPatientForm from "./pages/ipd/IPDPatientForm";
 import IPDPaymentList from "./pages/ipd/payments/IPDPaymentList";
+import IPDFollowUps from "./pages/ipd/IPDFollowUps"
+
 
 import DoctorOPDLayout from "./pages/doctor/DoctorOPDLayout";
 import { DoctorOPDDashboard } from "./pages/doctor/DoctorOPDDashboard";
@@ -83,6 +84,7 @@ function AppRoutes() {
         <Route path="/ipd/admit"     element={<IPDPatientForm patients={ipdPatients} setPatients={setIpdPatients} />} />
         <Route path="/ipd/patients"  element={<IPDPatientList patients={ipdPatients} setPatients={setIpdPatients} />} />
         <Route path="/ipd/payments"  element={<IPDPaymentList />} />
+        <Route path="/ipd/followups"  element={<IPDFollowUps />} />
       </Route>
 
       {/* Doctor OPD — /doctor/opd itself just redirects to the dashboard;
@@ -110,14 +112,10 @@ function AppRoutes() {
         </ProtectedRoute>
       }>
         <Route path="/doctor/ipd" element={<DoctorIPDDashboard patients={ipdPatients} />} />
+        <Route path="/doctor/ipd/followups" element={< IPDFollowUps patients={ipdPatients} />} />
       </Route>
 
-      {/* Doctor Profile — shared across OPD and IPD doctors, so it's guarded
-          by role only (no module restriction). NOTE: this assumes
-          ProtectedRoute skips the module check when `module` isn't passed —
-          double check that against your actual ProtectedRoute.jsx. If it
-          requires module, split this into two routes (one per module) like
-          the blocks above instead. */}
+         
       <Route element={
         <ProtectedRoute role="doctor">
           <Layout />

@@ -46,6 +46,7 @@ const menuConfig = {
   ],
   "doctor-IPD": [
     { label: "IPD Patients", icon: BedDouble, to: "/doctor/ipd" },
+    { label: "Follow-Ups", icon: CalendarClock, to: "/doctor/ipd/followups" },
   ],
   "pharmacy-Pharmacy": [
     { label: "Dashboard",     icon: LayoutDashboard, to: "/pharmacy-dashboard"  },
