@@ -336,13 +336,13 @@ export default function IPDPatientList({ readOnly = false }) {
       <div className="mt-4">
         <Pagination current={page} total={totalPages} onPageChange={setPage} />
       </div>
-
+        {/* ipd deleting */}
       {deleteId && (
         <DeleteModal
           name={patients.find(p => p.id === deleteId)?.name}
           onConfirm={() => handleDelete(deleteId)}
           onCancel={() => setDeleteId(null)}
-        />
+        />  
       )}
     </div>
   );

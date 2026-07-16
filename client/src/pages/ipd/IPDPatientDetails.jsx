@@ -202,7 +202,7 @@ export default function IPDPatientDetails({ patient: initP, onBack, readOnly = f
               <input ref={fileRef} type="file" className="hidden" onChange={handleFile} accept="image/*,.pdf" />
             </div>
           )}
-
+  
           {(!p.documents || p.documents.length === 0) ? (
             <div className="text-center py-8 text-slate-400 dark:text-slate-500 text-sm flex flex-col items-center gap-2">
               <Paperclip className="w-8 h-8 opacity-30" />

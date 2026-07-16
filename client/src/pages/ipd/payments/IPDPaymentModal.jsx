@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { fetchPatientPayments, addPayment } from "./api/ipdPayment.api";
 import { X, IndianRupee, Clock } from "lucide-react";
-
+  
 const METHODS = [
   { value: "CASH", label: "Cash" },
   { value: "UPI", label: "UPI" },
