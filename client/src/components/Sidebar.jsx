@@ -35,6 +35,7 @@ const menuConfig = {
     { label: "Admit Patient", icon: BedDouble,       to: "/ipd/admit"     },
     { label: "All Patients",  icon: Users,           to: "/ipd/patients"  },
     { label: "Payments",      icon: Wallet,          to: "/ipd/payments"  },
+    { label: "Follow-Ups",      icon: CalendarClock, to: "/ipd/followups"  },
   ],
   "doctor-OPD": [
     { label: "Dashboard",    icon: LayoutDashboard, to: "/doctor/opd/dashboard" },
@@ -43,6 +44,7 @@ const menuConfig = {
   ],
   "doctor-IPD": [
     { label: "IPD Patients", icon: BedDouble, to: "/doctor/ipd" },
+    { label: "Follow-Ups",   icon: CalendarClock, to: "/doctor/ipd/followups" },
   ],
   "pharmacy-Pharmacy": [
     { label: "Dashboard",     icon: LayoutDashboard, to: "/pharmacy-dashboard"  },
