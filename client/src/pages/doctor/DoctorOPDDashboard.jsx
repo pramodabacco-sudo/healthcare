@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../lib/api";
 import {
-  Users, CalendarClock, AlertTriangle, Activity, Loader2, ArrowRight, IndianRupee, Wallet,
+  Users, CalendarClock, AlertTriangle, Activity, Loader2, ArrowRight, IndianRupee,
 } from "lucide-react";
 
 function StatCard({ icon: Icon, label, value, accent }) {
@@ -79,7 +79,6 @@ export function DoctorOPDDashboard() {
 
   const {
     totalPatients, seenToday, pendingFollowUps, criticalCount,
-    totalRevenue, todayRevenue, todayCash, todayUpi,
     recentPatients, criticalPatients,
   } = stats;
 
@@ -110,34 +109,6 @@ export function DoctorOPDDashboard() {
           label="Critical Patients"
           value={criticalCount}
           accent={{ iconWrap: "bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400" }}
-        />
-      </div>
-
-      {/* Revenue stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          icon={IndianRupee}
-          label="Today's Revenue"
-          value={`₹${todayRevenue.toLocaleString()}`}
-          accent={{ iconWrap: "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400" }}
-        />
-        <StatCard
-          icon={Wallet}
-          label="Today — Cash"
-          value={`₹${todayCash.toLocaleString()}`}
-          accent={{ iconWrap: "bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400" }}
-        />
-        <StatCard
-          icon={Wallet}
-          label="Today — UPI"
-          value={`₹${todayUpi.toLocaleString()}`}
-          accent={{ iconWrap: "bg-violet-100 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400" }}
-        />
-        <StatCard
-          icon={IndianRupee}
-          label="Total Revenue (All Time)"
-          value={`₹${totalRevenue.toLocaleString()}`}
-          accent={{ iconWrap: "bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400" }}
         />
       </div>
 
@@ -217,6 +188,13 @@ export function DoctorOPDDashboard() {
               className="w-full flex items-center justify-between px-3.5 py-3 rounded-xl bg-teal-50 dark:bg-teal-500/10 border border-teal-200 dark:border-teal-500/20 text-teal-700 dark:text-teal-400 text-sm font-medium hover:bg-teal-100 dark:hover:bg-teal-500/15 transition-colors"
             >
               <span className="flex items-center gap-2"><Users className="w-4 h-4" /> View All Patients</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => navigate("/doctor/opd/revenue")}
+              className="w-full flex items-center justify-between px-3.5 py-3 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-sm font-medium hover:bg-emerald-100 dark:hover:bg-emerald-500/15 transition-colors"
+            >
+              <span className="flex items-center gap-2"><IndianRupee className="w-4 h-4" /> View Revenue</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
