@@ -1,5 +1,5 @@
 // client/src/App.jsx
-// Replace your existing App.jsx with this file
+// all routes 
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useState } from "react";
 import { AuthProvider, useAuth } from "./context/AuthContext";
@@ -24,7 +24,7 @@ import DoctorOPDLayout from "./pages/doctor/DoctorOPDLayout";
 import { DoctorOPDDashboard } from "./pages/doctor/DoctorOPDDashboard";
 import { DoctorOPDRevenue } from "./pages/doctor/DoctorOPDRevenue";
 import { DoctorIPDDashboard } from "./pages/doctor/DoctorIPDDashboard";
-
+import {IPDDoctorDashboard} from "./pages/doctor/IPDDoctorDashboard"
 import Profile from "./pages/profile/Profile";
 
 import AdminLayout from "./pages/admin/AdminLayout";
@@ -38,6 +38,7 @@ import PharmacyMedicineList from "./pages/pharmacy/PharmacyMedicineList";
 import PharmacyMedicineForm from "./pages/pharmacy/PharmacyMedicineForm";
 import PharmacyStockHistory from "./pages/pharmacy/PharmacyStockHistory";
 import PharmacyExpiryAlerts from "./pages/pharmacy/PharmacyExpiryAlerts";
+import { Import } from "lucide-react";
 
 function AppRoutes() {
   const { user, initializing } = useAuth();
@@ -115,14 +116,12 @@ function AppRoutes() {
           <Layout />
         </ProtectedRoute>
       }>
+        
+        <Route path="/doctor/ipd/dashboard" element={<IPDDoctorDashboard patients={ipdPatients} />} />
         <Route path="/doctor/ipd" element={<DoctorIPDDashboard patients={ipdPatients} />} />
       </Route>
 
-      {/* Admin — own layout/sidebar (menuConfig key "admin-ADMIN" in
-          Sidebar.jsx), separate from the doctor/receptionist/pharmacy module
-          system entirely. requireModule already lets ADMIN role through for
-          any OPD/IPD/PHARMACY-guarded route (see auth.middleware.js), so
-          these are the admin-ONLY pages — dashboard + staff/employee mgmt. */}
+         {/* profile */}
       <Route element={
         <ProtectedRoute role="admin">
           <Layout />

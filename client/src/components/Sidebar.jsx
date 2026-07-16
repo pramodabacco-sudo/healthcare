@@ -46,6 +46,7 @@ const menuConfig = {
     { label: "My Profile",   icon: UserRound,       to: "/profile" },
   ],
   "doctor-IPD": [
+    { label: "Dashboard", icon: LayoutDashboard, to: "/doctor/ipd/dashboard" },
     { label: "IPD Patients", icon: BedDouble, to: "/doctor/ipd" },
     { label: "My Profile",   icon: UserRound, to: "/profile" },
   ],
@@ -63,7 +64,7 @@ const menuConfig = {
     { label: "My Profile",         icon: UserRound,       to: "/admin/profile" },
   ],
 };
-
+  
 export default function Sidebar({ collapsed, setCollapsed }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
