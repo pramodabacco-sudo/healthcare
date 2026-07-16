@@ -7,12 +7,13 @@
 // render inside this layout via <Outlet />.
 import { Outlet } from "react-router-dom";
 import { NavLink } from "react-router-dom";
-import { Users, CalendarClock, ShieldAlert, LayoutDashboard } from "lucide-react";
+import { Users, CalendarClock, ShieldAlert, LayoutDashboard, IndianRupee } from "lucide-react";
 
 const TABS = [
   { key: "dashboard", label: "Dashboard",  icon: LayoutDashboard, to: "/doctor/opd/dashboard" },
   { key: "patients",  label: "Patients",   icon: Users,           to: "/doctor/opd/patients"  },
   { key: "followups", label: "Follow-Ups", icon: CalendarClock,   to: "/doctor/opd/followups" },
+  { key: "revenue",   label: "Revenue",    icon: IndianRupee,     to: "/doctor/opd/revenue"   },
 ];
 
 export default function DoctorOPDLayout() {
