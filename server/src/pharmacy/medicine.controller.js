@@ -77,6 +77,11 @@ export async function createMedicine(req, res) {
         purchasePrice: parseFloat(purchasePrice) || 0,
         sellingPrice: parseFloat(sellingPrice) || 0,
         quantity: initialQuantity,
+        // Permanent record of this batch's starting count. Unlike `quantity`
+        // (which Add/Reduce/Adjust Stock and OPD prescriptions change every
+        // day), this is set once here and never written to again — so even
+        // after quantity hits 0, you can still see how large the batch was.
+        initialQuantity,
         reorderLevel: parseInt(reorderLevel, 10) || 0,
         expiryDate: new Date(expiryDate),
         supplierName: supplierName || null,

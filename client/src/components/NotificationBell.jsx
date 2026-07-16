@@ -50,7 +50,14 @@ export default function NotificationBell() {
 
   if (!canSeeMedicines) return null;
 
-  const allNotifications = getMedicineNotifications(medicines);
+  // Doctors don't need "out of stock" alerts — that's a Pharmacy/receptionist
+  // restocking concern. Low-stock and expiry alerts still matter to doctors
+  // (affects what they can prescribe), so only that one category is dropped,
+  // and only for the doctor role — everyone else sees the full set.
+  const isDoctor = user?.role === "doctor";
+  const allNotifications = getMedicineNotifications(medicines).filter(
+    (n) => !(isDoctor && n.key.endsWith(":out-of-stock"))
+  );
   const visible = allNotifications.filter(n => !readKeys.has(n.key));
 
   const markAsRead = async (key) => {

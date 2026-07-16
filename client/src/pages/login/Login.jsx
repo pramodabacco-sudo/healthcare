@@ -49,7 +49,7 @@ function routeFor(role, module) {
   const m = String(module || "").toUpperCase();
   if (r === "receptionist" && m === "OPD") return "/opd-dashboard";
   if (r === "receptionist" && m === "IPD") return "/ipd-dashboard";
-  if (r === "doctor" && m === "OPD") return "/doctor/opd";
+  if (r === "doctor" && m === "OPD") return "/doctor/opd/dashboard";
   if (r === "doctor" && m === "IPD") return "/doctor/ipd";
   if (r === "pharmacy") return "/pharmacy-dashboard";
   return "/login";
@@ -195,12 +195,14 @@ export default function Login() {
 
       <div className="w-full max-w-[480px] relative z-10">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white dark:bg-slate-900 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] border border-slate-100 dark:border-slate-800 mb-4 transition-transform duration-300 hover:scale-105">
-            <svg className="w-7 h-7 text-teal-600 dark:text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 10.5V20a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-9.5m14 0V9a2 2 0 0 0-2-2h-3.5M19 10.5h-3.5m-7 0H5m4 0V9a2 2 0 0 1 2-2h3.5m-5.5 3.5H13m-4 4h5m-5 4h3" />
-            </svg>
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">MediCore</h1>
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white dark:bg-slate-900 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] border border-slate-100 dark:border-slate-800 mb-4 overflow-hidden transition-transform duration-300 hover:scale-105">
+          <img
+            src="/healthcare.jpg"
+            alt="MediCore Logo"
+            className="w-full h-full object-cover"
+          />
+        </div>
+          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">Virupakshipuram Paralysis Centre</h1>
           <p className="text-slate-500 dark:text-slate-400 font-medium mt-1 text-sm tracking-wide uppercase">Hospital Management System</p>
         </div>
 

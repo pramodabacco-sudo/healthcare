@@ -1,8 +1,8 @@
 // client/src/pages/pharmacy/PharmacyMedicineForm.jsx
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { PageHeader, FormInput, FormSelect, FormTextarea, SectionCard } from "../../components/UI";
-import { ArrowLeft, Pill, Package, DollarSign, Truck, FileText, Save, X, Plus, Loader2 } from "lucide-react";
+import { ArrowLeft, Pill, Package, DollarSign, Truck, FileText, Save, X, Plus, Loader2, Layers, Copy } from "lucide-react";
 import { api } from "../../lib/api";
 
 const defaultForm = {
@@ -85,13 +85,100 @@ function AddCategoryModal({ onCancel, onCreated }) {
 }
 
 export default function PharmacyMedicineForm({ medicines, setMedicines, editMedicine, onDone }) {
+  const { id: routeId } = useParams();
+  // editMedicine only arrives as a prop when we got here via in-app
+  // navigation (e.g. clicking Edit from a list that already has the data
+  // in memory). If this component was mounted straight from the URL —
+  // a new tab, a refresh, a shared link — there's no in-memory medicine to
+  // receive, even though the URL clearly has the id. In that case we fetch
+  // it ourselves using the :id route param.
+  const needsFetch = !editMedicine && !!routeId;
+  const [fetchedMedicine, setFetchedMedicine] = useState(null);
+  const [fetchingMedicine, setFetchingMedicine] = useState(needsFetch);
+  const [fetchError, setFetchError] = useState("");
+
+  const activeEditMedicine = editMedicine || fetchedMedicine;
+
   const [form, setForm] = useState(editMedicine || defaultForm);
   const [categories, setCategories] = useState([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [existingMedicines, setExistingMedicines] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!needsFetch) return;
+    (async () => {
+      setFetchingMedicine(true);
+      setFetchError("");
+      try {
+        const { medicine } = await api.get(`/pharmacy/medicines/${routeId}`);
+        setFetchedMedicine(medicine);
+        setForm(medicine);
+      } catch (err) {
+        setFetchError(err.message || "Could not load this medicine.");
+      } finally {
+        setFetchingMedicine(false);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [routeId]);
+
+  // Load the full medicine list once so we can spot "this drug already has
+  // other batches" while the pharmacist is typing the drug name below. Only
+  // relevant when adding a NEW medicine — editing an existing row doesn't
+  // need this lookup.
+  useEffect(() => {
+    if (editMedicine || needsFetch) return;
+    (async () => {
+      try {
+        const { medicines: data } = await api.get("/pharmacy/medicines");
+        setExistingMedicines(data);
+      } catch {
+        // silent — this is a helpful-hint feature, not a blocking one; the
+        // form still works fine without it if this fetch fails
+      }
+    })();
+  }, [editMedicine, needsFetch]);
+
+  // Substring match (not exact) so partial typing like "para" surfaces
+  // "Paracetamol 500mg" as the pharmacist types — this is meant to work like
+  // live autocomplete, not just catch an already-complete name. Requires at
+  // least 3 characters so it doesn't fire on every single keystroke.
+  // Results are grouped by exact drug name, since a short substring (e.g.
+  // "cet") could otherwise match several unrelated drugs at once.
+  const typed = form.drugName.trim().toLowerCase();
+  const matchedGroups = typed.length >= 3
+    ? Object.values(
+        existingMedicines
+          .filter((m) => m.drugName.toLowerCase().includes(typed))
+          .reduce((groups, m) => {
+            const key = m.drugName.trim().toLowerCase();
+            (groups[key] ||= { drugName: m.drugName, batches: [] }).batches.push(m);
+            return groups;
+          }, {})
+      )
+    : [];
+
+  // Copies the non-batch-specific fields from an existing entry as a starting
+  // point — Medicine ID, Batch Number, Quantity, and Expiry Date are left for
+  // the pharmacist to fill in fresh, since those must differ per batch.
+  const useAsTemplate = (m) => {
+    setForm((f) => ({
+      ...f,
+      drugName: m.drugName,
+      genericName: m.genericName || "",
+      category: m.category || "",
+      manufacturer: m.manufacturer || "",
+      purchasePrice: m.purchasePrice ?? "",
+      sellingPrice: m.sellingPrice ?? "",
+      reorderLevel: m.reorderLevel ?? "",
+      supplierName: m.supplierName || "",
+      notes: m.notes || "",
+    }));
+  };
 
   const fetchCategories = async () => {
     setCategoriesLoading(true);
@@ -120,22 +207,29 @@ export default function PharmacyMedicineForm({ medicines, setMedicines, editMedi
     setSaving(true);
     setError("");
 
-    if (editMedicine) {
-      // Editing still uses the old local-state approach for now — the
-      // Medicine list/update/delete backend endpoints come with the next
-      // round of work on PharmacyMedicineList.jsx.
-      const entry = {
+    if (activeEditMedicine) {
+      const payload = {
         ...form,
-        id: editMedicine.id,
         purchasePrice: parseFloat(form.purchasePrice) || 0,
         sellingPrice: parseFloat(form.sellingPrice) || 0,
         quantity: parseInt(form.quantity) || 0,
         reorderLevel: parseInt(form.reorderLevel) || 0,
-        stockHistory: editMedicine.stockHistory || [],
       };
-      setMedicines(ms => ms.map(m => m.id === editMedicine.id ? entry : m));
-      setSaving(false);
-      if (onDone) onDone(); else navigate("/pharmacy/medicines");
+      try {
+        const { medicine: updated } = await api.put(`/pharmacy/medicines/${activeEditMedicine.id}`, payload);
+        // setMedicines is only available when this form was rendered from
+        // a parent that already has the list in memory (e.g. navigated to
+        // in-app). When opened fresh via URL, there's nothing to sync
+        // locally — the API call above is the source of truth either way.
+        if (setMedicines) {
+          setMedicines(ms => ms.map(m => m.id === updated.id ? updated : m));
+        }
+        if (onDone) onDone(updated); else navigate("/pharmacy/medicines");
+      } catch (err) {
+        setError(err.message || "Could not update this medicine. Please try again.");
+      } finally {
+        setSaving(false);
+      }
       return;
     }
 
@@ -155,10 +249,42 @@ export default function PharmacyMedicineForm({ medicines, setMedicines, editMedi
     ? (((parseFloat(form.sellingPrice) - parseFloat(form.purchasePrice)) / parseFloat(form.purchasePrice)) * 100).toFixed(1)
     : null;
 
+  if (fetchingMedicine) {
+    return (
+      <div className="w-full px-2 sm:px-4 max-w-6xl mx-auto">
+        <PageHeader title="Edit Medicine" subtitle="Pharmacy inventory management" />
+        <div className="flex items-center justify-center py-16">
+          <div className="flex items-center gap-3 text-slate-400 dark:text-slate-500 text-sm font-medium">
+            <Loader2 className="w-5 h-5 animate-spin" /> Loading medicine...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="w-full px-2 sm:px-4 max-w-6xl mx-auto">
+        <PageHeader
+          title="Edit Medicine"
+          subtitle="Pharmacy inventory management"
+          action={
+            <button onClick={back} className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white text-sm font-medium transition-colors">
+              <ArrowLeft className="w-4 h-4" /> Back
+            </button>
+          }
+        />
+        <div className="bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 rounded-xl px-4 py-3 text-rose-600 dark:text-rose-400 text-sm font-medium mb-4">
+          {fetchError}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full px-2 sm:px-4 max-w-6xl mx-auto">
       <PageHeader
-        title={editMedicine ? "Edit Medicine" : "Add Medicine"}
+        title={activeEditMedicine ? "Edit Medicine" : "Add Medicine"}
         subtitle="Pharmacy inventory management"
         action={
           <button onClick={back} className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white text-sm font-medium transition-colors">
@@ -210,6 +336,58 @@ export default function PharmacyMedicineForm({ medicines, setMedicines, editMedi
             <FormInput label="Manufacturer"          value={form.manufacturer} onChange={set("manufacturer")} placeholder="e.g. Sun Pharma" />
             <FormInput label="Batch Number"          value={form.batchNumber}  onChange={set("batchNumber")}  placeholder="e.g. BTH-2024-001" required />
           </div>
+
+          {/* Existing-drug reference panel — only while adding (not editing).
+              Substring-matches as you type, grouped by exact drug name since
+              a short search term could match more than one drug. Purely
+              informational + a prefill shortcut; submitting always creates a
+              brand-new row, never merges into these. */}
+          {!activeEditMedicine && matchedGroups.length > 0 && (
+            <div className="mt-4 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl p-4 space-y-4">
+              <div className="flex items-center gap-2">
+                <Layers className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                <p className="text-sm font-semibold text-blue-800 dark:text-blue-300">
+                  {matchedGroups.length === 1
+                    ? `${matchedGroups[0].drugName} already in inventory`
+                    : `${matchedGroups.length} matching drugs already in inventory`}
+                </p>
+              </div>
+
+              {matchedGroups.map((group) => (
+                <div key={group.drugName}>
+                  {matchedGroups.length > 1 && (
+                    <p className="text-xs font-semibold text-blue-700 dark:text-blue-400 mb-1.5">{group.drugName}</p>
+                  )}
+                  <div className="space-y-2">
+                    {group.batches.map((m) => (
+                      <div
+                        key={m.id}
+                        className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900 border border-blue-100 dark:border-slate-700 rounded-xl px-3.5 py-2.5"
+                      >
+                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+                          <span>Batch: <span className="font-mono text-slate-700 dark:text-slate-300">{m.batchNumber}</span></span>
+                          <span>Category: <span className="text-slate-700 dark:text-slate-300">{m.category}</span></span>
+                          <span>In Stock: <span className={`font-semibold ${m.quantity === 0 ? "text-red-500 dark:text-red-400" : "text-slate-700 dark:text-slate-300"}`}>{m.quantity}</span></span>
+                          <span>Expiry: <span className="text-slate-700 dark:text-slate-300">{m.expiryDate}</span></span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => useAsTemplate(m)}
+                          className="flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold text-blue-700 dark:text-blue-400 hover:underline"
+                        >
+                          <Copy className="w-3.5 h-3.5" /> Use as template
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+
+              <p className="text-[11px] text-blue-700/70 dark:text-blue-400/70">
+                This will start a new, separate batch — Medicine ID, Batch Number, Quantity, and Expiry Date still need to be entered fresh below.
+              </p>
+            </div>
+          )}
         </SectionCard>
 
         <SectionCard title="Pricing" icon={DollarSign}>
@@ -256,7 +434,7 @@ export default function PharmacyMedicineForm({ medicines, setMedicines, editMedi
             className="flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-400 text-white font-semibold px-6 py-2.5 rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-emerald-500/20 text-sm disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            {saving ? "Saving..." : editMedicine ? "Update Medicine" : "Add Medicine"}
+            {saving ? "Saving..." : activeEditMedicine ? "Update Medicine" : "Add Medicine"}
           </button>
           <button
             type="button"

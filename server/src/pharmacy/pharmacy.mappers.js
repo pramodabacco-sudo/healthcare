@@ -41,6 +41,7 @@ export function fromDbMedicine(medicine) {
     purchasePrice: medicine.purchasePrice,
     sellingPrice: medicine.sellingPrice,
     quantity: medicine.quantity,
+    initialQuantity: medicine.initialQuantity,
     reorderLevel: medicine.reorderLevel,
     expiryDate: formatDate(medicine.expiryDate),
     supplierName: medicine.supplierName || "",

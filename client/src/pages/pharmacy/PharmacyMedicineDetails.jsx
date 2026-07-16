@@ -115,8 +115,9 @@ export default function PharmacyMedicineDetails({ medicine: initMed, onBack, onU
 
         {/* Stock & Expiry */}
         <SectionCard title="Stock & Expiry" icon={Package}>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
             {[
+              { label: "Batch Size",      val: med.initialQuantity ?? "—", color: "text-slate-800 dark:text-white", bg: "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-transparent" },
               { label: "In Stock",        val: med.quantity,       color: med.quantity === 0 ? "text-red-500 dark:text-red-400" : med.quantity <= med.reorderLevel ? "text-amber-500 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400", bg: "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-transparent" },
               { label: "Reorder Level",   val: med.reorderLevel,   color: "text-slate-800 dark:text-white",                     bg: "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-transparent" },
               { label: "Expiry Date",     val: med.expiryDate,     color: expiryDiff <= 30 ? "text-red-500 dark:text-red-400" : "text-slate-800 dark:text-white", bg: "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-transparent" },
@@ -128,6 +129,11 @@ export default function PharmacyMedicineDetails({ medicine: initMed, onBack, onU
               </div>
             ))}
           </div>
+          {med.initialQuantity > 0 && (
+            <p className="text-xs text-slate-400 dark:text-slate-500 mt-3">
+              {med.initialQuantity - med.quantity} of {med.initialQuantity} unit(s) dispensed/used from this batch so far.
+            </p>
+          )}
         </SectionCard>
 
         {/* Supplier */}

@@ -165,6 +165,13 @@ async function main() {
 
   // 2. Medicines — upsert by serialNumber. Stock history only gets created
   // the FIRST time (on create); re-running won't duplicate history rows.
+  //
+  // `initialQuantity` is the permanent record of this batch's starting
+  // count (mirrors what the real Add Medicine form does — the number typed
+  // becomes both `quantity` and `initialQuantity`). Like `quantity`, it's
+  // deliberately left out of the `update` branch below: re-running this
+  // seed shouldn't overwrite either the live stock level or the recorded
+  // batch size if the app has since dispensed/adjusted stock in between.
   for (const m of MEDICINES) {
     const categoryId = categoryByName[m.category];
     if (!categoryId) {
@@ -189,9 +196,10 @@ async function main() {
           expiryDate: new Date(m.expiryDate),
           supplierName: m.supplierName,
           notes: m.notes,
-          // quantity intentionally NOT touched on update — same rule the
-          // real API follows, so re-running the seed doesn't fight with
-          // any stock changes made through the app in the meantime.
+          // quantity AND initialQuantity intentionally NOT touched on
+          // update — same rule the real API follows, so re-running the
+          // seed doesn't fight with any stock changes made through the
+          // app in the meantime.
         },
       });
       console.log(`♻️  Medicine updated: ${m.drugName}`);
@@ -207,6 +215,9 @@ async function main() {
           purchasePrice: m.purchasePrice,
           sellingPrice: m.sellingPrice,
           quantity: m.quantity,
+          // Batch size at creation — same value as the starting `quantity`,
+          // recorded once and never overwritten afterwards.
+          initialQuantity: m.quantity,
           reorderLevel: m.reorderLevel,
           expiryDate: new Date(m.expiryDate),
           supplierName: m.supplierName,

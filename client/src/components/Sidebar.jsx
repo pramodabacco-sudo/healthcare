@@ -15,7 +15,6 @@ import {
   Activity,
   Menu,
   X,
-  Cross,
   Pill,
   History,
   Clock,
@@ -39,8 +38,9 @@ const menuConfig = {
     { label: "Follow-Ups",      icon: CalendarClock, to: "/ipd/followups"  },
   ],
   "doctor-OPD": [
-    { label: "OPD Patients", icon: Stethoscope,   to: "/doctor/opd"           },
-    { label: "Follow-Ups",   icon: CalendarClock, to: "/doctor/opd/followups" },
+    { label: "Dashboard",    icon: LayoutDashboard, to: "/doctor/opd/dashboard" },
+    { label: "OPD Patients", icon: Stethoscope,     to: "/doctor/opd/patients"  },
+    { label: "Follow-Ups",   icon: CalendarClock,   to: "/doctor/opd/followups" },
   ],
   "doctor-IPD": [
     { label: "IPD Patients", icon: BedDouble, to: "/doctor/ipd" },
@@ -80,15 +80,12 @@ export default function Sidebar({ collapsed, setCollapsed }) {
       {/* Logo */}
       <div className={`flex items-center gap-3 px-4 py-5 border-b border-slate-200 dark:border-slate-800 flex-shrink-0 ${mini ? "flex-col gap-2 px-0" : ""}`}>
         <div className="relative flex-shrink-0">
-          <div className={`w-9 h-9 rounded-xl flex items-center justify-center shadow-lg ${
-            isPharmacy
-              ? "bg-gradient-to-br from-emerald-500 to-teal-400 shadow-emerald-500/25"
-              : "bg-gradient-to-br from-teal-500 to-cyan-400 shadow-teal-500/25"
-          }`}>
-            {isPharmacy
-              ? <Pill className="w-4 h-4 text-white" strokeWidth={2.5} />
-              : <Cross className="w-4 h-4 text-white" strokeWidth={2.5} />
-            }
+          <div className="w-9 h-9 rounded-xl overflow-hidden shadow-lg shadow-emerald-500/25">
+            <img
+              src="/healthcare.jpg"
+              alt="MediCore logo"
+              className="w-full h-full object-cover"
+            />
           </div>
           <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-white dark:border-slate-900" />
         </div>
@@ -144,6 +141,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
               <li key={link.to}>
                 <NavLink
                   to={link.to}
+                  end
                   onClick={() => setMobileOpen(false)}
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 text-sm font-medium group relative ${
