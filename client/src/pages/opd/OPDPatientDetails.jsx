@@ -17,7 +17,7 @@ const reminderStatusColors = {
   "Not Set": "text-slate-400 dark:text-slate-500",
 };
 
-export default function OPDPatientDetails({ patient: initP, onBack, onUpdated, readOnly = false }) {
+export default function OPDPatientDetails({ patient: initP, onBack, onUpdated, isDoctor = false }) {
   const [p, setP] = useState(initP);
   const [loadingPatient, setLoadingPatient] = useState(true);
   const [doctorForm, setDoctorForm] = useState({
@@ -229,28 +229,22 @@ export default function OPDPatientDetails({ patient: initP, onBack, onUpdated, r
                 Follow-Up Status
                 {statusSaving && <Loader2 className="w-3 h-3 animate-spin" />}
               </div>
-              {!readOnly ? (
-                <div className="flex gap-2 flex-wrap">
-                  {["Pending", "Completed", "Missed"].map(s => (
-                    <button
-                      key={s}
-                      disabled={statusSaving}
-                      onClick={() => handleFollowUpStatus(s)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all disabled:opacity-60 ${
-                        p.followUpStatus === s
-                          ? followUpStatusColors[s] + " ring-1 ring-offset-1 ring-current"
-                          : "bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
-                      }`}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${followUpStatusColors[p.followUpStatus] || followUpStatusColors["Pending"]}`}>
-                  {p.followUpStatus || "Pending"}
-                </span>
-              )}
+              <div className="flex gap-2 flex-wrap">
+                {["Pending", "Completed", "Missed"].map(s => (
+                  <button
+                    key={s}
+                    disabled={statusSaving}
+                    onClick={() => handleFollowUpStatus(s)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all disabled:opacity-60 ${
+                      p.followUpStatus === s
+                        ? followUpStatusColors[s] + " ring-1 ring-offset-1 ring-current"
+                        : "bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    }`}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {p.followUpDesc && (
@@ -382,7 +376,7 @@ export default function OPDPatientDetails({ patient: initP, onBack, onUpdated, r
         </SectionCard>
 
         <SectionCard title="Doctor Notes & Prescription" icon={Stethoscope}>
-          {readOnly ? (
+          {isDoctor ? (
             <div className="space-y-3">
               <div>
                 <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Diagnosis</label>

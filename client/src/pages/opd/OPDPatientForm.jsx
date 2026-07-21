@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { PageHeader, FormInput, FormSelect, FormTextarea, SectionCard } from "../../components/UI";
 import { ArrowLeft, User, CreditCard, ClipboardList, Save, X, Bell, Loader2, Pill, Plus, Trash2, AlertTriangle } from "lucide-react";
 import { api } from "../../lib/api";
+import { useAuth } from "../../context/AuthContext";
 
 const emptyForm = {
   name: "", age: "", gender: "", place: "", phone: "",
@@ -26,6 +27,13 @@ export default function OPDPatientForm({ editPatient, onDone }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { user } = useAuth();
+  // When there's no onDone callback (i.e. this form is reached via a direct
+  // route, not embedded from a details view), fall back to navigating to
+  // the patients list — but the correct list depends on which role is
+  // logged in, since /opd/patients and /doctor/opd/patients are guarded
+  // by different ProtectedRoute roles.
+  const patientsPath = user?.role === "doctor" ? "/doctor/opd/patients" : "/opd/patients";
 
   // Prescribed Medicines: when EDITING an existing patient, items are real
   // (have an id) and save/delete immediately via the API, same as the
@@ -161,7 +169,7 @@ export default function OPDPatientForm({ editPatient, onDone }) {
     try {
       if (patientId) {
         await api.put(`/opd/patients/${patientId}`, form);
-        if (onDone) onDone(); else navigate("/opd/patients");
+        if (onDone) onDone(); else navigate(patientsPath);
         return;
       }
 
@@ -192,14 +200,14 @@ export default function OPDPatientForm({ editPatient, onDone }) {
         return; // stay on the page so the receptionist sees this
       }
 
-      if (onDone) onDone(); else navigate("/opd/patients");
+      if (onDone) onDone(); else navigate(patientsPath);
     } catch (err) {
       setError(err.message || "Could not save this patient. Please try again.");
       setSaving(false);
     }
   };
 
-  const back = () => onDone ? onDone() : navigate("/opd/patients");
+  const back = () => onDone ? onDone() : navigate(patientsPath);
 
   if (loading) {
     return (

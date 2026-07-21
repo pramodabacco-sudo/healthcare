@@ -17,7 +17,7 @@ const followUpStatusColors = {
   Missed:    "bg-red-50 dark:bg-red-500/15 text-red-700 dark:text-red-400 border-red-200 dark:border-red-500/20",
 };
 
-export default function OPDPatients({ readOnly = false }) {
+export default function OPDPatients({ isDoctor = false }) {
   const [patients, setPatients]   = useState([]);
   const [loading, setLoading]     = useState(true);
   const [error, setError]         = useState("");
@@ -28,6 +28,7 @@ export default function OPDPatients({ readOnly = false }) {
   const [deleteId, setDeleteId]   = useState(null);
   const [viewing, setViewing]     = useState(null);
   const navigate = useNavigate();
+  const basePath = isDoctor ? "/doctor/opd" : "/opd";
 
   const fetchPatients = async () => {
     setLoading(true);
@@ -76,7 +77,7 @@ export default function OPDPatients({ readOnly = false }) {
           setPatients(ps => ps.map(p => p.id === updated.id ? updated : p));
           setViewing(updated);
         }}
-        readOnly={readOnly}
+        isDoctor={isDoctor}
       />
     );
   }
@@ -87,16 +88,14 @@ export default function OPDPatients({ readOnly = false }) {
         title="OPD Patients"
         subtitle={loading ? "Loading..." : `${filtered.length} records`}
         action={
-          !readOnly && (
-            <button
-              onClick={() => navigate("/opd/register")}
-              className="flex items-center gap-2 bg-gradient-to-r from-teal-500 to-cyan-400 text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-teal-500/20"
-            >
-              <UserPlus className="w-4 h-4" />
-              <span className="hidden sm:inline">Register Patient</span>
-              <span className="sm:hidden">Register</span>
-            </button>
-          )
+          <button
+            onClick={() => navigate(`${basePath}/register`)}
+            className="flex items-center gap-2 bg-gradient-to-r from-teal-500 to-cyan-400 text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-teal-500/20"
+          >
+            <UserPlus className="w-4 h-4" />
+            <span className="hidden sm:inline">Register Patient</span>
+            <span className="sm:hidden">Register</span>
+          </button>
         }
       />
 
@@ -153,7 +152,7 @@ export default function OPDPatients({ readOnly = false }) {
                   <Th>Phone</Th><Th>Place</Th>
                   <Th>Fee</Th><Th>Cash</Th><Th>UPI</Th><Th>Total</Th>
                   <Th>Visit Date</Th><Th>Follow-Up</Th>
-                  {!readOnly && <Th>Actions</Th>}
+                  <Th>Actions</Th>
                 </tr>
               </thead>
               <tbody>
@@ -185,15 +184,13 @@ export default function OPDPatients({ readOnly = false }) {
                         </span>
                       ) : <span className="text-slate-300 dark:text-slate-600">—</span>}
                     </Td>
-                    {!readOnly && (
-                      <Td>
-                        <div className="flex gap-1">
-                          <ActionBtn type="view"   onClick={() => setViewing(p)} />
-                          <ActionBtn type="edit"   onClick={() => navigate(`/opd/patients/${p.id}/edit`)} />
-                          <ActionBtn type="delete" onClick={() => setDeleteId(p.id)} />
-                        </div>
-                      </Td>
-                    )}
+                    <Td>
+                      <div className="flex gap-1">
+                        <ActionBtn type="view"   onClick={() => setViewing(p)} />
+                        <ActionBtn type="edit"   onClick={() => navigate(`${basePath}/patients/${p.id}/edit`)} />
+                        <ActionBtn type="delete" onClick={() => setDeleteId(p.id)} />
+                      </div>
+                    </Td>
                   </tr>
                 ))}
               </tbody>
@@ -261,13 +258,11 @@ export default function OPDPatients({ readOnly = false }) {
                   <button onClick={() => setViewing(p)} className="text-xs text-teal-600 dark:text-teal-400 font-semibold hover:underline">
                     View Details →
                   </button>
-                  {!readOnly && (
-                    <div className="flex gap-1.5">
-                      <ActionBtn type="view"   onClick={() => setViewing(p)} />
-                      <ActionBtn type="edit"   onClick={() => navigate(`/opd/patients/${p.id}/edit`)} />
-                      <ActionBtn type="delete" onClick={() => setDeleteId(p.id)} />
-                    </div>
-                  )}
+                  <div className="flex gap-1.5">
+                    <ActionBtn type="view"   onClick={() => setViewing(p)} />
+                    <ActionBtn type="edit"   onClick={() => navigate(`${basePath}/patients/${p.id}/edit`)} />
+                    <ActionBtn type="delete" onClick={() => setDeleteId(p.id)} />
+                  </div>
                 </div>
               </div>
             ))}

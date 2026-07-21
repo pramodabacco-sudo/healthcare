@@ -111,7 +111,9 @@ function AppRoutes() {
         <Route element={<DoctorOPDLayout />}>
           <Route path="/doctor/opd" element={<Navigate to="/doctor/opd/dashboard" replace />} />
           <Route path="/doctor/opd/dashboard" element={<DoctorOPDDashboard />} />
-          <Route path="/doctor/opd/patients"  element={<OPDPatientList readOnly />} />
+          <Route path="/doctor/opd/register"  element={<OPDPatientForm />} />
+          <Route path="/doctor/opd/patients/:id/edit" element={<OPDPatientForm />} />
+          <Route path="/doctor/opd/patients"  element={<OPDPatientList isDoctor />} />
           <Route path="/doctor/opd/followups" element={<OPDFollowUps patients={opdPatients} />} />
           <Route path="/doctor/opd/revenue"   element={<DoctorOPDRevenue />} />
         </Route>
