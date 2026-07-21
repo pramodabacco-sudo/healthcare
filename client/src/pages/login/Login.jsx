@@ -221,7 +221,7 @@ export default function Login() {
           <img 
             src="/healthcare.jpg" 
             alt="Hospital Banner" 
-            className="w-full h-full object-cover filter brightness-[0.8] dark:brightness-[0.4] contrast-125"
+            className="w-full h-full object-cover filter brightness-[1.2] dark:brightness-[2.8] contrast-125"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-slate-900/80 dark:from-slate-950 dark:via-slate-950/40 dark:to-slate-950/80" />
           <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-transparent to-slate-900 dark:from-slate-950/80 dark:via-transparent dark:to-slate-950" />

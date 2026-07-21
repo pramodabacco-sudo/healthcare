@@ -330,7 +330,22 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="space-y-10">
+    // Outer wrapper carries the watermark background so it sits behind every card,
+    // and content sits in a relatively-positioned layer above it (z-10).
+    <div className="relative">
+      {/* Background watermark image */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-0 bg-no-repeat opacity-[0.6] dark:opacity-[0.4]"
+        style={{
+          backgroundImage: "url('/healthcare-icon.png')",
+          backgroundSize: "800px 800px",      // Width Height
+          backgroundPosition: "center -110px", // Move image upward
+        }}
+      />
+
+      {/* Everything below sits above the watermark */}
+      <div className="relative z-10 space-y-10">
 
        <div className="flex items-center gap-2">
           <TrendingUp className="w-4 h-4 text-slate-400" />
@@ -385,10 +400,7 @@ export default function AdminDashboard() {
 
       {/* ================= Dashboard Analytics ================= */}
       <section className="space-y-8">
-        <div className="flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-slate-400" />
-          <h2 className="text-base font-bold text-slate-800 dark:text-white">Dashboard Analytics</h2>
-        </div>
+        
 
         {/* OPD analytics */}
         <SubSection icon={Stethoscope} title="OPD Analytics" color="teal">
@@ -396,7 +408,7 @@ export default function AdminDashboard() {
             <ResponsiveContainer width="100%" height={240}>
               <LineChart data={opdDaily}>
                 <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-slate-200 dark:text-slate-800" />
-                <XAxis dataKey="label" tick={{ fontSize: 12 }} stroke="currentColor" className="text-slate-400" />
+                <XAxis dataKey="label" tick={{ fontSize: 12 }} stroke="currentColor" className="text-slate-400 dark:text-amber-50" />
                 <YAxis allowDecimals={false} tick={{ fontSize: 12 }} stroke="currentColor" className="text-slate-400" />
                 <Tooltip contentStyle={tooltipStyle} />
                 <Line type="monotone" dataKey="count" name="Patients" stroke={COLORS.teal} strokeWidth={2.5} dot={{ r: 3 }} />
@@ -488,6 +500,7 @@ export default function AdminDashboard() {
         field on each medicine. "Top Consumed Medicines" is derived from initial vs. current stock as a proxy for
         dispensing volume. Values will be approximate until a real per-dispense counter is tracked.
       </p>
+      </div>
     </div>
   );
 }
@@ -522,7 +535,7 @@ const ACCENTS = {
 function SummaryCard({ icon: Icon, title, accent, rows }) {
   const a = ACCENTS[accent] || ACCENTS.teal;
   return (
-    <div className="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 h-full flex flex-col shadow-sm hover:shadow-md transition-shadow">
+    <div className="relative bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 h-full flex flex-col shadow-sm hover:shadow-md transition-shadow">
       <div className={`absolute inset-x-0 top-0 h-1 rounded-t-2xl bg-gradient-to-r ${a.ring}`} />
       <div className="flex items-center gap-3 mb-4">
         <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${a.icon}`}>
@@ -563,7 +576,7 @@ function SubSection({ icon: Icon, title, color, children }) {
 
 function ChartCard({ title, children }) {
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5">
+    <div className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl p-5">
       <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">{title}</h4>
       {children}
     </div>
@@ -619,5 +632,3 @@ const WIDGET_COLORS = {
   amber: "text-amber-500 bg-amber-50 dark:bg-amber-500/10",
   cyan: "text-cyan-500 bg-cyan-50 dark:bg-cyan-500/10",
 };
-
- 

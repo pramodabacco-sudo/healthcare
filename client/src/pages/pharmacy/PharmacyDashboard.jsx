@@ -90,7 +90,22 @@ export default function PharmacyDashboard() {
   }
 
   return (
-    <div className="p-3 sm:p-6 max-w-7xl mx-auto w-full overflow-hidden">
+    // Outer wrapper carries the watermark background so it sits behind every card,
+    // and content sits in a relatively-positioned layer above it (z-10).
+    <div className="relative p-3 sm:p-6 max-w-7xl mx-auto w-full overflow-hidden">
+      {/* Background watermark image */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-0 bg-no-repeat opacity-[0.6] dark:opacity-[0.4]"
+        style={{
+          backgroundImage: "url('/healthcare-icon.png')",
+          backgroundSize: "1000px 1000px",      // Width Height
+          backgroundPosition: "center -110px", // Move image upward
+        }}
+      />
+
+      {/* Everything below sits above the watermark */}
+      <div className="relative z-10">
       <PageHeader
         title="Pharmacy Dashboard"
         subtitle="Inventory overview"
@@ -122,7 +137,7 @@ export default function PharmacyDashboard() {
       {/* Alerts row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {/* Low Stock */}
-        <div className="bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 rounded-2xl p-4 sm:p-5">
+        <div className="bg-amber-50/50 dark:bg-amber-500/50 border border-amber-200 dark:border-amber-500/20 rounded-2xl p-4 sm:p-5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-amber-800 dark:text-amber-400 font-semibold text-sm flex items-center gap-2">
               <Package className="w-4 h-4" /> Low Stock
@@ -151,7 +166,7 @@ export default function PharmacyDashboard() {
         </div>
 
         {/* Expiring Soon */}
-        <div className="bg-violet-50 dark:bg-violet-500/5 border border-violet-200 dark:border-violet-500/20 rounded-2xl p-4 sm:p-5">
+        <div className="bg-violet-50/50 dark:bg-violet-500/50 border border-violet-200 dark:border-violet-500/20 rounded-2xl p-4 sm:p-5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-violet-800 dark:text-violet-400 font-semibold text-sm flex items-center gap-2">
               <Clock className="w-4 h-4" /> Expiring Soon
@@ -180,7 +195,7 @@ export default function PharmacyDashboard() {
         </div>
 
         {/* Expired */}
-        <div className="bg-red-50 dark:bg-red-500/5 border border-red-200 dark:border-red-500/20 rounded-2xl p-4 sm:p-5">
+        <div className="bg-red-50/50 dark:bg-red-500/50 border border-red-200 dark:border-red-500/20 rounded-2xl p-4 sm:p-5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-red-800 dark:text-red-400 font-semibold text-sm flex items-center gap-2">
               <XCircle className="w-4 h-4" /> Expired
@@ -211,7 +226,7 @@ export default function PharmacyDashboard() {
 
       {/* Category breakdown + Recent medicines */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm dark:shadow-none transition-colors duration-300">
+        <div className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm dark:shadow-none transition-colors duration-300">
           <h3 className="text-slate-800 dark:text-white font-semibold text-sm mb-4 flex items-center gap-2">
             <Boxes className="w-4 h-4 text-slate-400 dark:text-slate-500" />
             Top Categories
@@ -238,7 +253,7 @@ export default function PharmacyDashboard() {
           )}
         </div>
 
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm dark:shadow-none transition-colors duration-300 lg:col-span-2">
+        <div className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm dark:shadow-none transition-colors duration-300 lg:col-span-2">
           <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-slate-800">
             <h3 className="text-slate-800 dark:text-white font-semibold text-sm flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-slate-400 dark:text-slate-500" /> Recently Added
@@ -288,6 +303,7 @@ export default function PharmacyDashboard() {
             </div>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

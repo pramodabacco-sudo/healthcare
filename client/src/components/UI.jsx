@@ -9,8 +9,8 @@ import {
 export function StatCard({ label, value, icon: Icon, color = "blue", sub }) {
   const colorMap = {
     blue:   "from-blue-50 to-blue-100/50 dark:from-blue-500/20 dark:to-blue-600/10 border-blue-200 dark:border-blue-500/20 text-blue-600 dark:text-blue-400",
-    green:  "from-emerald-50 to-emerald-100/50 dark:from-emerald-500/20 dark:to-emerald-600/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400",
-    yellow: "from-amber-50 to-amber-100/50 dark:from-amber-500/20 dark:to-amber-600/10 border-amber-200 dark:border-amber-500/20 text-amber-600 dark:text-amber-400",
+    green:  "from-emerald-40 to-emerald-50/50 dark:from-emerald-500/20 dark:to-emerald-600/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400",
+    yellow: "from-amber-40 to-amber-50/30 dark:from-amber-500/20 dark:to-amber-600/10 border-amber-200 dark:border-amber-500/20 text-amber-600 dark:text-amber-400",
     purple: "from-violet-50 to-violet-100/50 dark:from-violet-500/20 dark:to-violet-600/10 border-violet-200 dark:border-violet-500/20 text-violet-600 dark:text-violet-400",
     red:    "from-red-50 to-red-100/50 dark:from-red-500/20 dark:to-red-600/10 border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400",
     cyan:   "from-cyan-50 to-cyan-100/50 dark:from-cyan-500/20 dark:to-cyan-600/10 border-cyan-200 dark:border-cyan-500/20 text-cyan-600 dark:text-cyan-400",

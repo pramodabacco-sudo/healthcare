@@ -37,7 +37,22 @@ export default function IPDDashboard() {
   } = stats;
 
   return (
-    <div className="p-3 sm:p-6 max-w-7xl mx-auto w-full overflow-hidden">
+    // Outer wrapper carries the watermark background so it sits behind every card,
+    // and content sits in a relatively-positioned layer above it (z-10).
+    <div className="relative p-3 sm:p-6 max-w-7xl mx-auto w-full overflow-hidden">
+      {/* Background watermark image */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-0 bg-no-repeat opacity-[0.6] dark:opacity-[0.4]"
+        style={{
+          backgroundImage: "url('/healthcare-icon.png')",
+          backgroundSize: "1000px 1000px",      // Width Height
+          backgroundPosition: "center -110px", // Move image upward
+        }}
+      />
+
+      {/* Everything below sits above the watermark */}
+      <div className="relative z-10">
       <PageHeader
         title="IPD Dashboard"
         subtitle="Inpatient Department Overview"
@@ -63,7 +78,7 @@ export default function IPDDashboard() {
       {/* Main Content Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
         {/* Active patients list */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm dark:shadow-none transition-colors duration-300">
+        <div className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm dark:shadow-none transition-colors duration-300">
           <div className="flex items-center justify-between px-4 sm:px-5 py-4 border-b border-slate-200 dark:border-slate-800">
             <h3 className="text-slate-800 dark:text-white font-semibold text-sm flex items-center gap-2">
               <Users className="w-4 h-4 text-slate-400 dark:text-slate-500" /> Active Patients
@@ -100,7 +115,7 @@ export default function IPDDashboard() {
 
         <div className="space-y-4">
           {/* Revenue Overview */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm dark:shadow-none transition-colors duration-300">
+          <div className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm dark:shadow-none transition-colors duration-300">
             <h3 className="text-slate-800 dark:text-white font-semibold text-sm mb-4 flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-slate-400 dark:text-slate-500" /> Revenue Overview
             </h3>
@@ -120,7 +135,7 @@ export default function IPDDashboard() {
           </div>
 
           {/* Recent discharges */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm dark:shadow-none transition-colors duration-300">
+          <div className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm dark:shadow-none transition-colors duration-300">
             <h3 className="text-slate-800 dark:text-white font-semibold text-sm mb-3 flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-slate-400 dark:text-slate-500" /> Recent Discharges
             </h3>
@@ -146,6 +161,7 @@ export default function IPDDashboard() {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

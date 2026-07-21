@@ -130,7 +130,22 @@ export function IPDDoctorDashboard() {
   };
 
   return (
-    <div className="w-full px-2 sm:px-4 max-w-7xl mx-auto">
+    // Outer wrapper carries the watermark background so it sits behind every card,
+    // and content sits in a relatively-positioned layer above it (z-10).
+    <div className="relative w-full px-2 sm:px-4 max-w-7xl mx-auto overflow-hidden">
+      {/* Background watermark image */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-0 bg-no-repeat opacity-[0.6] dark:opacity-[0.4]"
+        style={{
+          backgroundImage: "url('/healthcare-icon.png')",
+          backgroundSize: "1000px 1000px",      // Width Height
+          backgroundPosition: "center -110px", // Move image upward
+        }}
+      />
+
+      {/* Everything below sits above the watermark */}
+      <div className="relative z-10">
       <PageHeader title="Doctor Dashboard" subtitle="IPD ward overview at a glance" />
 
       {error && (
@@ -155,7 +170,7 @@ export function IPDDoctorDashboard() {
                 <button
                   key={c.label}
                   onClick={c.onClick}
-                  className="text-left bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm dark:shadow-none hover:shadow-md hover:-translate-y-0.5 transition-all"
+                  className="text-left bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm dark:shadow-none hover:shadow-md hover:-translate-y-0.5 transition-all"
                 >
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center border mb-3 ${colorClasses[c.color]}`}>
                     <Icon className="w-4.5 h-4.5" />
@@ -171,7 +186,7 @@ export function IPDDoctorDashboard() {
           {/* Row: Recent Patients (today's admissions) + Upcoming Follow-Ups */}
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 mb-5">
             {/* Recent Patients panel — TODAY's admissions only */}
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm dark:shadow-none">
+            <div className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm dark:shadow-none">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-800 dark:text-white">
                   <BedDouble className="w-4 h-4 text-blue-500" /> Recent Patients
@@ -214,7 +229,7 @@ export function IPDDoctorDashboard() {
             </div>
 
             {/* Upcoming Follow-Ups panel */}
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm dark:shadow-none">
+            <div className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm dark:shadow-none">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-800 dark:text-white">
                   <CalendarClock className="w-4 h-4 text-violet-500" /> Upcoming Follow-Ups
@@ -259,7 +274,7 @@ export function IPDDoctorDashboard() {
           </div>
 
           {/* Pending Reminders panel — full width, below */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm dark:shadow-none">
+          <div className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm dark:shadow-none">
             <div className="flex items-center justify-between mb-3">
               <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-800 dark:text-white">
                 <Bell className="w-4 h-4 text-red-500" /> Pending Reminders
@@ -320,6 +335,7 @@ export function IPDDoctorDashboard() {
           )}
         </>
       )}
+      </div>
     </div>
   );
 }
