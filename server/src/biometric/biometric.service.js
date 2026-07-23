@@ -376,7 +376,7 @@ export async function listLogs({ date, deviceId, mapped, page: pageQ, limit: lim
     const day = parseDateOnly(date);
     if (day) {
       const nextDay = new Date(day);
-      nextDay.setUTCDate(nextDay.getUTCDate() + 1);
+      nextDay.setDate(nextDay.getDate() + 1);
       where.punchTime = { gte: day, lt: nextDay };
     }
   }
@@ -484,7 +484,7 @@ async function attachPersonNames(records) {
 export async function getDashboard() {
   const today = startOfDay(new Date());
   const tomorrow = new Date(today);
-  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+  tomorrow.setDate(tomorrow.getDate() + 1);
 
   const [
     totalDevices,

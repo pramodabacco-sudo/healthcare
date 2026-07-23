@@ -22,7 +22,7 @@ export const DUPLICATE_PUNCH_WINDOW_SECONDS = 60;
 // Midnight of the given date, in UTC-safe terms — used as the Attendance.date key.
 export function startOfDay(date) {
   const d = new Date(date);
-  d.setUTCHours(0, 0, 0, 0);
+  d.setHours(0, 0, 0, 0);
   return d;
 }
 
@@ -33,7 +33,7 @@ export function minutesBetween(from, to) {
 // Minutes since midnight (local to the stored DateTime) for a given punch.
 function minutesSinceMidnight(date) {
   const d = new Date(date);
-  return d.getUTCHours() * 60 + d.getUTCMinutes();
+  return d.getHours() * 60 + d.getMinutes();
 }
 
 // Given the current first/last punch pair, compute workingMinutes,
@@ -89,7 +89,6 @@ export function parseIST(value) {
 
   const str = String(value).trim();
 
-  // yyyy-mm-dd hh:mm:ss
   const match = str.match(
     /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?$/
   );
@@ -97,16 +96,14 @@ export function parseIST(value) {
   if (match) {
     const [, y, m, d, hh, mm, ss = "0"] = match;
 
-    // Create UTC equivalent by subtracting IST offset (+5:30)
+    // Store exactly what the device sends (IST local time)
     return new Date(
-      Date.UTC(
-        Number(y),
-        Number(m) - 1,
-        Number(d),
-        Number(hh) - 5,
-        Number(mm) - 30,
-        Number(ss)
-      )
+      Number(y),
+      Number(m) - 1,
+      Number(d),
+      Number(hh),
+      Number(mm),
+      Number(ss)
     );
   }
 
