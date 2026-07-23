@@ -77,3 +77,39 @@ export function pagination(query) {
   const limit = Math.min(100, Math.max(1, parseInt(query.limit, 10) || 25));
   return { page, limit, skip: (page - 1) * limit };
 }
+
+
+// Parses device timestamp like:
+// "2026-06-26 09:15:00"
+// and treats it as IST instead of UTC.
+export function parseIST(value) {
+  if (!value) return null;
+
+  if (value instanceof Date) return value;
+
+  const str = String(value).trim();
+
+  // yyyy-mm-dd hh:mm:ss
+  const match = str.match(
+    /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?$/
+  );
+
+  if (match) {
+    const [, y, m, d, hh, mm, ss = "0"] = match;
+
+    // Create UTC equivalent by subtracting IST offset (+5:30)
+    return new Date(
+      Date.UTC(
+        Number(y),
+        Number(m) - 1,
+        Number(d),
+        Number(hh) - 5,
+        Number(mm) - 30,
+        Number(ss)
+      )
+    );
+  }
+
+  const parsed = new Date(str);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
